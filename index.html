@@ -1,0 +1,2381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#6c63ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SpeakingCoach">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon.svg">
+<title>Speaking Coach</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #242835;
+    --border: #2e3345;
+    --text: #e4e6f0;
+    --text2: #8b8fa3;
+    --accent: #6c63ff;
+    --accent2: #8b83ff;
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --orange: #fb923c;
+    --radius: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+  header h1 span { color: var(--accent); }
+
+  nav { display: flex; gap: 4px; }
+
+  nav button {
+    background: transparent;
+    color: var(--text2);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+
+  nav button:hover { background: var(--surface2); color: var(--text); }
+  nav button.active { background: var(--accent); color: #fff; }
+
+  main { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .card h2 { font-size: 18px; margin-bottom: 16px; font-weight: 600; }
+  .card h3 { font-size: 15px; margin-bottom: 8px; color: var(--accent2); font-weight: 600; }
+
+  .btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.15s;
+  }
+
+  .btn:hover { background: var(--accent2); transform: translateY(-1px); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+  .btn-outline:hover { border-color: var(--accent); background: rgba(108,99,255,0.1); }
+  .btn-sm { padding: 6px 14px; font-size: 13px; }
+  .btn-danger { background: var(--red); }
+  .btn-danger:hover { background: #ef4444; }
+  .btn-green { background: var(--green); color: #000; }
+  .btn-green:hover { background: #4ade80; }
+
+  .setup-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .setup-group label {
+    display: block;
+    font-size: 13px;
+    color: var(--text2);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  select, input[type="number"] {
+    width: 100%;
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+  }
+
+  select:focus, input:focus { border-color: var(--accent); }
+
+  /* Toggle switch */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+  }
+
+  .toggle-row .toggle-label {
+    font-size: 14px;
+  }
+
+  .toggle-row .toggle-desc {
+    font-size: 12px;
+    color: var(--text2);
+  }
+
+  .toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+  .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    transition: 0.2s;
+  }
+
+  .toggle-slider:before {
+    content: "";
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background: var(--text2);
+    border-radius: 50%;
+    transition: 0.2s;
+  }
+
+  .toggle-switch input:checked + .toggle-slider {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(20px);
+    background: #fff;
+  }
+
+  /* Timer */
+  .timer-display { text-align: center; padding: 40px 20px; }
+
+  .timer-display .phase-label {
+    font-size: 14px;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .timer-display .timer {
+    font-size: 72px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -2px;
+  }
+
+  .timer-display .prompt-text {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 24px 0;
+    line-height: 1.4;
+    color: var(--text);
+  }
+
+  .timer-display .framework-hint {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px auto;
+    max-width: 500px;
+    text-align: left;
+    font-size: 14px;
+    color: var(--text2);
+  }
+
+  .framework-hint strong { color: var(--accent2); }
+
+  .timer-controls {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+
+  .prep-color { color: var(--yellow); }
+  .speaking-color { color: var(--green); }
+  .done-color { color: var(--accent2); }
+
+  /* Facts display */
+  .facts-display {
+    background: var(--surface2);
+    border: 2px dashed var(--accent);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 16px auto;
+    max-width: 600px;
+    text-align: left;
+  }
+
+  .facts-display h4 {
+    color: var(--accent2);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+
+  .facts-display .fact-item {
+    padding: 6px 0;
+    font-size: 15px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .facts-display .fact-item:last-child { border-bottom: none; }
+
+  .facts-hidden-msg {
+    text-align: center;
+    color: var(--yellow);
+    font-size: 14px;
+    padding: 16px;
+    background: rgba(251,191,36,0.08);
+    border-radius: 8px;
+    margin: 16px auto;
+    max-width: 600px;
+  }
+
+  /* Passage display */
+  .passage-display {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 16px auto;
+    max-width: 600px;
+    font-size: 15px;
+    line-height: 1.7;
+    text-align: left;
+  }
+
+  /* Key points checklist */
+  .key-points-checklist {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+  }
+
+  .key-points-checklist label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .key-points-checklist input[type="checkbox"] {
+    margin-top: 3px;
+    accent-color: var(--accent);
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  /* Interruption overlay */
+  .interruption-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+  }
+
+  .interruption-card {
+    background: var(--surface);
+    border: 2px solid var(--orange);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 500px;
+    text-align: center;
+    animation: interruptPop 0.3s ease;
+  }
+
+  @keyframes interruptPop {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .interruption-card .interrupt-label {
+    color: var(--orange);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+
+  .interruption-card .interrupt-question {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  /* Audience overlay */
+  .audience-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 12px;
+    padding-bottom: 16px;
+    z-index: 50;
+    pointer-events: none;
+  }
+
+  .audience-figure {
+    width: 32px;
+    height: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0.6;
+  }
+
+  .audience-figure .head {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--text2);
+    margin-bottom: 2px;
+  }
+
+  .audience-figure .body {
+    width: 20px;
+    height: 28px;
+    border-radius: 8px 8px 0 0;
+    background: var(--text2);
+  }
+
+  /* Transcript */
+  .transcript-box {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 16px;
+    min-height: 80px;
+    max-height: 200px;
+    overflow-y: auto;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text2);
+    margin-top: 16px;
+  }
+
+  .transcript-box .filler { color: var(--red); font-weight: 600; text-decoration: underline; }
+  .transcript-box .interim { color: var(--text2); opacity: 0.5; font-style: italic; }
+  .transcript-box .long-sentence { background: rgba(251,191,36,0.15); border-radius: 3px; padding: 0 2px; }
+
+  /* Results */
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .results-grid-6 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .stat-card {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .stat-card .stat-value { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  .stat-card .stat-label {
+    font-size: 12px;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .score-excellent { color: var(--green); }
+  .score-good { color: var(--yellow); }
+  .score-needs-work { color: var(--orange); }
+  .score-poor { color: var(--red); }
+
+  /* Frameworks page */
+  .framework-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .framework-card:hover { border-color: var(--accent); }
+
+  .framework-card h3 { font-size: 16px; margin-bottom: 4px; color: var(--text); }
+  .framework-card .use-case { font-size: 13px; color: var(--text2); margin-bottom: 12px; }
+
+  .framework-steps { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .framework-step {
+    background: var(--surface2);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .framework-step span { color: var(--accent2); margin-right: 4px; }
+
+  .tips-list { list-style: none; }
+
+  .tips-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  .tips-list li:last-child { border-bottom: none; }
+  .tips-list li strong { color: var(--accent2); display: block; margin-bottom: 2px; }
+
+  .history-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+  .history-table th {
+    text-align: left;
+    padding: 10px 12px;
+    color: var(--text2);
+    font-weight: 500;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .history-table td { padding: 12px; border-bottom: 1px solid var(--border); }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .badge-green { background: rgba(52,211,153,0.15); color: var(--green); }
+  .badge-yellow { background: rgba(251,191,36,0.15); color: var(--yellow); }
+  .badge-red { background: rgba(248,113,113,0.15); color: var(--red); }
+
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text2); }
+  .empty-state p { margin-top: 8px; font-size: 14px; }
+
+  .section-hidden { display: none; }
+
+  .mic-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--red);
+    font-weight: 500;
+  }
+
+  .mic-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    animation: pulse 1.2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .feedback-section { margin-top: 16px; }
+  .feedback-section h3 { margin-bottom: 8px; }
+
+  .feedback-item {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+
+  .feedback-item .label {
+    color: var(--text2);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  /* Audio playback */
+  .audio-playback {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .audio-playback audio {
+    flex: 1;
+    height: 36px;
+    filter: invert(0.8);
+  }
+
+  /* Category strength bar */
+  .strength-bars { margin-top: 16px; }
+
+  .strength-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .strength-bar-label {
+    font-size: 13px;
+    color: var(--text2);
+    width: 100px;
+    flex-shrink: 0;
+  }
+
+  .strength-bar-track {
+    flex: 1;
+    height: 8px;
+    background: var(--surface2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .strength-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s;
+  }
+
+  .strength-bar-value {
+    font-size: 13px;
+    width: 36px;
+    text-align: right;
+    font-weight: 600;
+  }
+
+  /* Mode selector */
+  .mode-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .mode-btn {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 12px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+
+  .mode-btn:hover { border-color: var(--accent); color: var(--text); }
+  .mode-btn.active { border-color: var(--accent); background: rgba(108,99,255,0.1); color: var(--text); }
+  .mode-btn .mode-title { font-weight: 600; font-size: 14px; }
+  .mode-btn .mode-desc { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+  @media (max-width: 640px) {
+    .setup-grid { grid-template-columns: 1fr; }
+    .results-grid { grid-template-columns: repeat(2, 1fr); }
+    .timer-display .timer { font-size: 48px; }
+    header { padding: 12px 16px; flex-direction: column; gap: 12px; }
+    main { padding: 20px 16px; }
+    .mode-selector { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Speaking<span>Coach</span></h1>
+  <nav>
+    <button class="active" data-tab="drill">Practice</button>
+    <button data-tab="frameworks">Frameworks</button>
+    <button data-tab="tips">Quick Tips</button>
+    <button data-tab="history">History</button>
+  </nav>
+</header>
+
+<main>
+  <!-- ===== DRILL TAB ===== -->
+  <section id="tab-drill">
+    <!-- Setup phase -->
+    <div id="drill-setup" class="card">
+      <h2>Practice Mode</h2>
+
+      <div class="mode-selector">
+        <div class="mode-btn active" data-mode="standard" onclick="selectMode('standard')">
+          <div class="mode-title">Standard</div>
+          <div class="mode-desc">Random prompt, speak on the spot</div>
+        </div>
+        <div class="mode-btn" data-mode="recall" onclick="selectMode('recall')">
+          <div class="mode-title">Fact Recall</div>
+          <div class="mode-desc">Memorize facts, weave them into your response</div>
+        </div>
+        <div class="mode-btn" data-mode="listening" onclick="selectMode('listening')">
+          <div class="mode-title">Listening</div>
+          <div class="mode-desc">Read a passage, then respond from memory</div>
+        </div>
+      </div>
+
+      <div class="setup-grid">
+        <div class="setup-group">
+          <label>Topic Category</label>
+          <select id="category">
+            <option value="all">All Categories (Random)</option>
+            <option value="general">General Knowledge</option>
+            <option value="business">Business & Investing</option>
+            <option value="tech">Technology</option>
+            <option value="abstract">Abstract & Creative</option>
+            <option value="debate">Debate & Persuasion</option>
+            <option value="explain">Explain Like I'm 5</option>
+          </select>
+        </div>
+        <div class="setup-group">
+          <label>Framework to Practice</label>
+          <select id="framework">
+            <option value="none">No Framework (Free Form)</option>
+            <option value="prep">PREP — Point, Reason, Example, Point</option>
+            <option value="wsn">What / So What / Now What</option>
+            <option value="ppf">Past / Present / Future</option>
+            <option value="psb">Problem / Solution / Benefit</option>
+            <option value="arev">AREV — Answer, Reason, Evidence, Verdict</option>
+          </select>
+        </div>
+        <div class="setup-group">
+          <label>Prep Time (seconds)</label>
+          <input type="number" id="prep-time" value="30" min="0" max="120" step="5">
+        </div>
+        <div class="setup-group">
+          <label>Speaking Time (seconds)</label>
+          <input type="number" id="speak-time" value="90" min="30" max="300" step="15">
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--border); padding-top:16px; margin-bottom:20px;">
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Audience Pressure</div>
+            <div class="toggle-desc">Visual audience + ambient noise to simulate real pressure</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="audience-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="toggle-row" style="margin-top:8px;">
+          <div>
+            <div class="toggle-label">Random Interruptions</div>
+            <div class="toggle-desc">Follow-up questions pop up mid-speech, forcing you to pivot</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="interrupt-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <button class="btn" onclick="startDrill()">Start Drill</button>
+    </div>
+
+    <!-- Active drill -->
+    <div id="drill-active" class="card section-hidden">
+      <div class="timer-display">
+        <div class="phase-label" id="phase-label">PREPARE</div>
+        <div class="timer" id="timer">0:30</div>
+        <div class="prompt-text" id="prompt-text"></div>
+
+        <!-- Facts display for recall mode -->
+        <div id="facts-area" class="section-hidden"></div>
+
+        <!-- Passage display for listening mode -->
+        <div id="passage-area" class="section-hidden"></div>
+
+        <!-- Key points to hit -->
+        <div id="key-points-display" class="section-hidden" style="background:var(--surface2); border-radius:8px; padding:16px; margin:16px auto; max-width:500px; text-align:left;">
+          <div style="font-size:12px; color:var(--accent2); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Key points to hit</div>
+          <div id="key-points-list"></div>
+        </div>
+
+        <div id="framework-guide" class="framework-hint section-hidden"></div>
+      </div>
+      <div id="transcript-area" class="section-hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span style="font-size:13px; color:var(--text2);">Live Transcript</span>
+          <span class="mic-indicator" id="mic-indicator"><span class="mic-dot"></span> Listening</span>
+        </div>
+        <div class="transcript-box" id="transcript"></div>
+      </div>
+      <div class="timer-controls">
+        <button class="btn btn-outline" onclick="skipPhase()" id="skip-btn">Skip Prep</button>
+        <button class="btn btn-danger" onclick="endDrill()">End Drill</button>
+      </div>
+    </div>
+
+    <!-- Interruption overlay -->
+    <div id="interruption-overlay" class="interruption-overlay section-hidden">
+      <div class="interruption-card">
+        <div class="interrupt-label">Follow-up Question</div>
+        <div class="interrupt-question" id="interrupt-question"></div>
+        <p style="color:var(--text2); font-size:13px; margin-bottom:16px;">Address this, then get back on track.</p>
+        <button class="btn" onclick="dismissInterruption()">Got It — Continue</button>
+      </div>
+    </div>
+
+    <!-- Audience visual -->
+    <div id="audience-bar" class="audience-bar section-hidden"></div>
+
+    <!-- Results -->
+    <div id="drill-results" class="card section-hidden">
+      <h2>Session Results</h2>
+      <div id="prompt-recall" style="color:var(--text2); font-size:14px; margin-bottom:16px;"></div>
+
+      <div class="results-grid results-grid-6" id="results-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="res-wpm">--</div>
+          <div class="stat-label">Words/Min</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="res-fillers">--</div>
+          <div class="stat-label">Filler Words</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="res-words">--</div>
+          <div class="stat-label">Total Words</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="res-pauses">--</div>
+          <div class="stat-label">Long Pauses</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="res-long-sent">--</div>
+          <div class="stat-label">Long Sentences</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="res-score">--</div>
+          <div class="stat-label">Overall Score</div>
+        </div>
+      </div>
+
+      <!-- Audio playback -->
+      <div id="audio-playback" class="audio-playback section-hidden">
+        <span style="font-size:13px; color:var(--text2); white-space:nowrap;">Listen back:</span>
+        <audio id="audio-player" controls></audio>
+      </div>
+
+      <!-- Key points self-check -->
+      <div id="key-points-check" class="section-hidden" style="margin-top:16px;">
+        <h3>Key Points — Did You Cover These?</h3>
+        <div class="key-points-checklist" id="key-points-checklist"></div>
+      </div>
+
+      <div class="feedback-section" id="feedback-section"></div>
+
+      <div style="margin-top:16px;">
+        <h3 style="font-size:15px; color:var(--accent2); margin-bottom:8px;">Your Transcript</h3>
+        <div class="transcript-box" id="final-transcript" style="max-height:300px;"></div>
+      </div>
+
+      <div style="margin-top:20px; display:flex; gap:12px;">
+        <button class="btn" onclick="startDrill()">New Drill</button>
+        <button class="btn btn-outline" onclick="showSetup()">Change Settings</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FRAMEWORKS TAB ===== -->
+  <section id="tab-frameworks" class="section-hidden">
+    <div class="card">
+      <h2>Speech Frameworks</h2>
+      <p style="color:var(--text2); font-size:14px; margin-bottom:20px;">
+        Frameworks give your impromptu responses instant structure. Even when you don't know the topic well, a framework makes you sound organized and credible. Click any framework to learn more.
+      </p>
+    </div>
+
+    <div class="framework-card" onclick="toggleFrameworkDetail(this)">
+      <h3>PREP</h3>
+      <div class="use-case">Best for: opinions, recommendations, answering direct questions</div>
+      <div class="framework-steps">
+        <div class="framework-step"><span>1</span> Point</div>
+        <div class="framework-step"><span>2</span> Reason</div>
+        <div class="framework-step"><span>3</span> Example</div>
+        <div class="framework-step"><span>4</span> Point (restate)</div>
+      </div>
+      <div class="framework-detail section-hidden" style="margin-top:16px; font-size:14px; color:var(--text2); line-height:1.8;">
+        <strong style="color:var(--text);">How to use PREP:</strong><br>
+        <strong style="color:var(--accent2);">Point:</strong> State your main takeaway up front. "I believe X."<br>
+        <strong style="color:var(--accent2);">Reason:</strong> Give the why. "The reason is..."<br>
+        <strong style="color:var(--accent2);">Example:</strong> Make it concrete. A story, data point, or analogy.<br>
+        <strong style="color:var(--accent2);">Point:</strong> Circle back to reinforce. "That's why X matters."<br><br>
+        <em>This is the single most versatile framework. When in doubt, use PREP.</em>
+      </div>
+    </div>
+
+    <div class="framework-card" onclick="toggleFrameworkDetail(this)">
+      <h3>What / So What / Now What</h3>
+      <div class="use-case">Best for: briefings, status updates, presenting findings</div>
+      <div class="framework-steps">
+        <div class="framework-step"><span>1</span> What</div>
+        <div class="framework-step"><span>2</span> So What</div>
+        <div class="framework-step"><span>3</span> Now What</div>
+      </div>
+      <div class="framework-detail section-hidden" style="margin-top:16px; font-size:14px; color:var(--text2); line-height:1.8;">
+        <strong style="color:var(--text);">How to use What / So What / Now What:</strong><br>
+        <strong style="color:var(--accent2);">What:</strong> State the facts. What happened? What did you find?<br>
+        <strong style="color:var(--accent2);">So What:</strong> Why does it matter? What are the implications?<br>
+        <strong style="color:var(--accent2);">Now What:</strong> What should we do next? The call to action.<br><br>
+        <em>Perfect for sounding executive-level. Forces you to move beyond facts into insight.</em>
+      </div>
+    </div>
+
+    <div class="framework-card" onclick="toggleFrameworkDetail(this)">
+      <h3>Past / Present / Future</h3>
+      <div class="use-case">Best for: trend analysis, history questions, vision-casting</div>
+      <div class="framework-steps">
+        <div class="framework-step"><span>1</span> Past</div>
+        <div class="framework-step"><span>2</span> Present</div>
+        <div class="framework-step"><span>3</span> Future</div>
+      </div>
+      <div class="framework-detail section-hidden" style="margin-top:16px; font-size:14px; color:var(--text2); line-height:1.8;">
+        <strong style="color:var(--text);">How to use Past / Present / Future:</strong><br>
+        <strong style="color:var(--accent2);">Past:</strong> Where did we come from? Historical context.<br>
+        <strong style="color:var(--accent2);">Present:</strong> Where are we now? Current state.<br>
+        <strong style="color:var(--accent2);">Future:</strong> Where are we headed? Your prediction or recommendation.<br><br>
+        <em>Great for sounding knowledgeable even on unfamiliar topics — everyone can anchor to "how things used to be."</em>
+      </div>
+    </div>
+
+    <div class="framework-card" onclick="toggleFrameworkDetail(this)">
+      <h3>Problem / Solution / Benefit</h3>
+      <div class="use-case">Best for: pitches, proposals, selling an idea</div>
+      <div class="framework-steps">
+        <div class="framework-step"><span>1</span> Problem</div>
+        <div class="framework-step"><span>2</span> Solution</div>
+        <div class="framework-step"><span>3</span> Benefit</div>
+      </div>
+      <div class="framework-detail section-hidden" style="margin-top:16px; font-size:14px; color:var(--text2); line-height:1.8;">
+        <strong style="color:var(--text);">How to use Problem / Solution / Benefit:</strong><br>
+        <strong style="color:var(--accent2);">Problem:</strong> Name the pain. Make the audience feel it.<br>
+        <strong style="color:var(--accent2);">Solution:</strong> Present your fix. Keep it clear and concrete.<br>
+        <strong style="color:var(--accent2);">Benefit:</strong> Paint the better future. What changes if we act?<br><br>
+        <em>Natural for anyone in investing — you already think in terms of problems and solutions.</em>
+      </div>
+    </div>
+
+    <div class="framework-card" onclick="toggleFrameworkDetail(this)">
+      <h3>AREV — Answer, Reason, Evidence, Verdict</h3>
+      <div class="use-case">Best for: Q&A sessions, defending a position, interviews</div>
+      <div class="framework-steps">
+        <div class="framework-step"><span>1</span> Answer</div>
+        <div class="framework-step"><span>2</span> Reason</div>
+        <div class="framework-step"><span>3</span> Evidence</div>
+        <div class="framework-step"><span>4</span> Verdict</div>
+      </div>
+      <div class="framework-detail section-hidden" style="margin-top:16px; font-size:14px; color:var(--text2); line-height:1.8;">
+        <strong style="color:var(--text);">How to use AREV:</strong><br>
+        <strong style="color:var(--accent2);">Answer:</strong> Give a direct answer immediately. Don't hedge.<br>
+        <strong style="color:var(--accent2);">Reason:</strong> Explain your logic.<br>
+        <strong style="color:var(--accent2);">Evidence:</strong> Back it up. Data, experience, or analogy.<br>
+        <strong style="color:var(--accent2);">Verdict:</strong> Summarize your position with confidence.<br><br>
+        <em>Similar to PREP but more assertive. Use when you need to sound decisive under pressure.</em>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TIPS TAB ===== -->
+  <section id="tab-tips" class="section-hidden">
+    <div class="card">
+      <h2>Quick Tips for Sounding Smart on the Spot</h2>
+      <ul class="tips-list">
+        <li><strong>Buy time without sounding like you're stalling</strong>Use bridge phrases: "That's a great question — the way I think about it is..." or "Let me frame this in terms of..." These give you 3-5 seconds to organize your thoughts.</li>
+        <li><strong>Lead with your conclusion</strong>Say your main point first, then support it. This is the opposite of how we naturally think (build up to a point), but it sounds far more confident and structured.</li>
+        <li><strong>Use the "Rule of Three"</strong>Group your thoughts into three points. "There are three things to consider here..." Three is memorable, structured, and sounds complete — even if you're making it up as you go.</li>
+        <li><strong>Acknowledge what you don't know</strong>"I'm not deeply familiar with X, but here's how I'd think about it from a [your expertise] perspective..." Honesty + reframing = instant credibility.</li>
+        <li><strong>Use analogies aggressively</strong>If you don't know the specifics, compare it to something you do know. "This is similar to how..." Analogies make you sound thoughtful and help the audience follow along.</li>
+        <li><strong>Pause instead of filling</strong>A 2-second pause sounds powerful and deliberate. "Um" and "uh" sound uncertain. When you feel a filler word coming, just stop talking briefly. The silence feels longer to you than to the audience.</li>
+        <li><strong>End strong — don't trail off</strong>Plan your last sentence. Drop your vocal pitch at the end (signals authority). Never end with "so, yeah" or "that's pretty much it." Instead: "And that's why I believe X."</li>
+        <li><strong>Reframe questions you can't answer</strong>"I think the more interesting question is..." or "The way I'd reframe that is..." This lets you steer toward what you do know.</li>
+        <li><strong>Speak in shorter sentences</strong>Long, winding sentences signal that you're figuring it out as you go. Short sentences signal clarity. When in doubt, put a period where you'd put a comma.</li>
+        <li><strong>Practice the "one breath" test</strong>If you can't say your main point in one breath, it's not clear enough. Simplify until you can. Complexity is easy; clarity is hard — and impressive.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== HISTORY TAB ===== -->
+  <section id="tab-history" class="section-hidden">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin-bottom:0;">Practice History</h2>
+        <button class="btn btn-outline btn-sm" onclick="clearHistory()">Clear All</button>
+      </div>
+      <div id="history-content"></div>
+    </div>
+    <div class="card">
+      <h2>Category Strengths</h2>
+      <p style="color:var(--text2); font-size:13px; margin-bottom:12px;">Average scores by topic. Weaker categories appear more often in "All Categories" mode.</p>
+      <div class="strength-bars" id="strength-bars"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+// ===== PROMPTS DATABASE =====
+const PROMPTS = {
+  general: [
+    "What is the most important skill everyone should learn?",
+    "Should college education be free for everyone?",
+    "What makes a great leader?",
+    "Is social media doing more harm than good?",
+    "What is one thing you would change about the education system?",
+    "Why is reading important in the digital age?",
+    "What does success mean to you?",
+    "Should voting be mandatory?",
+    "What is the role of failure in personal growth?",
+    "Is it better to be a specialist or a generalist?",
+    "What makes a city a great place to live?",
+    "Should we prioritize space exploration over solving Earth's problems?",
+    "What is the biggest challenge facing the next generation?",
+    "Is remote work better than in-office work?",
+    "What is the most underrated quality in a person?",
+    "Should there be limits on free speech?",
+    "What can we learn from history that applies today?",
+    "Is competition healthy or harmful?",
+    "What role should government play in healthcare?",
+    "Is privacy dead in the modern world?",
+  ],
+  business: [
+    "What makes a company a good long-term investment?",
+    "How should a CEO decide between growth and profitability?",
+    "What is the most important metric for a SaaS company?",
+    "Why do most startups fail?",
+    "What is the role of culture in a company's success?",
+    "How do you evaluate management quality in a company?",
+    "What makes a market attractive for investment?",
+    "Should companies prioritize shareholders or stakeholders?",
+    "What is the biggest risk in the software industry right now?",
+    "How do you think about competitive moats?",
+    "Is vertical integration a good strategy?",
+    "What separates great salespeople from good ones?",
+    "How should a company approach pricing strategy?",
+    "What is the role of M&A in building a business?",
+    "How do you assess total addressable market?",
+    "What makes a subscription business model powerful?",
+    "How should companies think about technical debt?",
+    "What is the most important thing in a board presentation?",
+    "How do you build trust with a management team?",
+    "What is the biggest mistake investors make?",
+  ],
+  tech: [
+    "How will AI change the software industry in the next 5 years?",
+    "What is the most important recent technology breakthrough?",
+    "Should we regulate artificial intelligence?",
+    "What makes a technology platform successful?",
+    "How should companies approach cybersecurity?",
+    "What is the future of cloud computing?",
+    "Is open source better than proprietary software?",
+    "How will AI impact the job market?",
+    "What is the next big platform shift?",
+    "Should tech companies be broken up?",
+    "What makes a great API?",
+    "How should non-technical leaders think about technology decisions?",
+    "What is the role of data in modern business?",
+    "Is blockchain technology overhyped?",
+    "How do you evaluate a technology company's product?",
+    "What is the biggest risk of AI adoption?",
+    "How should companies think about build vs. buy?",
+    "What makes a technology team effective?",
+    "Should there be a universal standard for data privacy?",
+    "What is the future of human-computer interaction?",
+  ],
+  abstract: [
+    "If you could have dinner with anyone in history, who and why?",
+    "What would you do if you had one year to live?",
+    "Describe the color blue to someone who has never seen it.",
+    "If you could solve one global problem overnight, which would it be?",
+    "What would a perfect day look like for you?",
+    "If you could create a new holiday, what would it celebrate?",
+    "What is an idea that changed how you see the world?",
+    "If you could live in any era of history, when would you choose?",
+    "What would you teach in a class called 'Life Skills 101'?",
+    "If you could give every person on Earth one piece of advice, what would it be?",
+    "Describe the internet to someone from 1900.",
+    "What would you put in a time capsule for people 100 years from now?",
+    "If you could redesign the school system from scratch, what would it look like?",
+    "What is the most beautiful thing you've ever experienced?",
+    "If money were no object, what problem would you dedicate your life to solving?",
+  ],
+  debate: [
+    "Argue in favor of: universal basic income.",
+    "Argue against: standardized testing in schools.",
+    "Defend the position that failure is more valuable than success.",
+    "Make the case that print books are better than e-books.",
+    "Argue that working from home is better for productivity.",
+    "Defend the position that social media should be banned for children under 16.",
+    "Make the case for why smaller companies are better places to work.",
+    "Argue that experience matters more than education.",
+    "Defend the position that AI will create more jobs than it destroys.",
+    "Make the case that governments should invest more in the arts.",
+    "Argue that long-term thinking is more important than short-term results.",
+    "Defend the position that transparency is always the best policy.",
+    "Make the case that competition is more beneficial than collaboration.",
+    "Argue that privacy is more important than national security.",
+    "Defend the position that optimism is a more effective leadership trait than realism.",
+  ],
+  explain: [
+    "Explain how the stock market works — simply.",
+    "Explain what inflation is and why it matters.",
+    "Explain what a competitive moat is in business.",
+    "Explain how the internet works.",
+    "Explain what machine learning is.",
+    "Explain the concept of compound interest.",
+    "Explain how a company goes public (IPO).",
+    "Explain what a recession is.",
+    "Explain the difference between revenue and profit.",
+    "Explain how supply and demand work.",
+    "Explain what private equity does.",
+    "Explain how SaaS businesses make money.",
+    "Explain the concept of network effects.",
+    "Explain what an API is to a non-technical person.",
+    "Explain why diversification matters in investing.",
+  ],
+};
+
+// ===== KEY POINTS per prompt =====
+const KEY_POINTS = {
+  "What makes a company a good long-term investment?": [
+    "Durable competitive advantage or moat",
+    "Strong and aligned management team",
+    "Large or growing addressable market",
+    "Consistent free cash flow generation",
+  ],
+  "How should a CEO decide between growth and profitability?": [
+    "Depends on stage and market maturity",
+    "Unit economics must be sound regardless",
+    "Capital availability and runway matters",
+    "Growth without a path to profit is unsustainable",
+  ],
+  "What is the most important metric for a SaaS company?": [
+    "Net revenue retention as a signal of product-market fit",
+    "CAC payback period for capital efficiency",
+    "Gross margin as a measure of scalability",
+    "ARR growth rate for trajectory",
+  ],
+  "Why do most startups fail?": [
+    "No real product-market fit",
+    "Running out of cash / poor capital management",
+    "Team or founder issues",
+    "Timing — too early or too late for the market",
+  ],
+  "What makes a great leader?": [
+    "Clear communication and vision",
+    "Ability to build trust",
+    "Willingness to make hard decisions",
+    "Empowering others rather than micromanaging",
+  ],
+  "Is social media doing more harm than good?": [
+    "Impact on mental health, especially youth",
+    "Democratization of information and voice",
+    "Misinformation and polarization risks",
+    "Economic value vs. social cost tradeoff",
+  ],
+  "How will AI change the software industry in the next 5 years?": [
+    "Automation of routine coding tasks",
+    "Shift in the developer role toward architecture and review",
+    "New categories of software enabled by AI",
+    "Impact on pricing and competitive dynamics",
+  ],
+  "Should we regulate artificial intelligence?": [
+    "Safety and existential risk considerations",
+    "Innovation vs. precautionary principle",
+    "International coordination challenges",
+    "Specific use cases that clearly need guardrails",
+  ],
+  "What does success mean to you?": [
+    "Personal definition vs. societal default",
+    "Balance between achievement and fulfillment",
+    "Role of relationships and health",
+    "How the definition evolves over time",
+  ],
+  "Is it better to be a specialist or a generalist?": [
+    "Context matters — industry, career stage",
+    "Specialists go deep, generalists connect dots",
+    "T-shaped skills as a hybrid approach",
+    "Market demand and scarcity considerations",
+  ],
+};
+
+// Default key points generator for prompts not in the map
+function generateKeyPoints(prompt) {
+  if (KEY_POINTS[prompt]) return KEY_POINTS[prompt];
+  // Generate generic structural key points
+  return [
+    "State a clear position or thesis",
+    "Provide at least one supporting reason",
+    "Include a concrete example or analogy",
+    "End with a strong closing statement",
+  ];
+}
+
+// ===== FACT RECALL DATABASE =====
+const FACT_RECALL_SETS = [
+  {
+    topic: "The global SaaS market",
+    prompt: "Discuss the current state and future of the SaaS market.",
+    facts: [
+      "The global SaaS market is valued at approximately $197 billion",
+      "Average net revenue retention for top SaaS companies is 120%+",
+      "The median SaaS company spends 50% of revenue on sales & marketing",
+      "Only 28% of SaaS companies are profitable at IPO",
+    ]
+  },
+  {
+    topic: "Remote work trends",
+    prompt: "Make the case for or against remote work as the future of business.",
+    facts: [
+      "58% of American workers can work remotely at least one day per week",
+      "Remote workers report 25% lower turnover rates",
+      "Companies save an average of $11,000 per year per remote worker",
+      "67% of remote workers feel disconnected from coworkers",
+    ]
+  },
+  {
+    topic: "Higher education economics",
+    prompt: "Discuss whether college is still worth the investment.",
+    facts: [
+      "Average student loan debt is $37,000 per borrower",
+      "College graduates earn 75% more than high school graduates over a lifetime",
+      "40% of college students don't graduate within 6 years",
+      "Tuition has increased 1,200% since 1980, outpacing inflation by 4x",
+    ]
+  },
+  {
+    topic: "Artificial intelligence adoption",
+    prompt: "Discuss the impact of AI adoption on businesses.",
+    facts: [
+      "77% of companies are either using or exploring AI",
+      "AI could contribute $15.7 trillion to the global economy by 2030",
+      "Only 23% of companies have incorporated AI into processes and products",
+      "The average ROI on AI projects is 5.9x the investment",
+    ]
+  },
+  {
+    topic: "Cybersecurity landscape",
+    prompt: "Discuss why cybersecurity should be a board-level priority.",
+    facts: [
+      "The average cost of a data breach is $4.45 million",
+      "It takes an average of 277 days to identify and contain a breach",
+      "95% of cybersecurity breaches are caused by human error",
+      "The global cybersecurity market is expected to reach $376 billion by 2029",
+    ]
+  },
+  {
+    topic: "Climate and business",
+    prompt: "Discuss how climate change will affect business strategy.",
+    facts: [
+      "Climate-related disasters cost the global economy $313 billion in 2022",
+      "ESG-focused funds now manage over $35 trillion in assets globally",
+      "The renewable energy sector employs 13.7 million people worldwide",
+      "Carbon capture technology costs have fallen 85% in the last decade",
+    ]
+  },
+  {
+    topic: "Private equity performance",
+    prompt: "Make the case for or against private equity as an asset class.",
+    facts: [
+      "PE has outperformed the S&P 500 by 1-3% annually over 20 years",
+      "Average PE holding period has increased from 3.6 to 5.6 years",
+      "PE-backed companies account for 11.7 million US jobs",
+      "Management fees and carry typically take 5-7% of total returns",
+    ]
+  },
+  {
+    topic: "The attention economy",
+    prompt: "Discuss whether the attention economy is sustainable.",
+    facts: [
+      "The average person spends 2 hours 31 minutes on social media daily",
+      "The attention economy is worth over $500 billion annually in ad revenue",
+      "Human attention span for digital content has dropped to 8 seconds",
+      "47% of consumers experience digital fatigue regularly",
+    ]
+  },
+  {
+    topic: "Healthcare technology",
+    prompt: "Discuss how technology is transforming healthcare delivery.",
+    facts: [
+      "Telehealth usage increased 3,800% during the pandemic",
+      "AI can diagnose certain cancers with 94% accuracy — matching radiologists",
+      "US healthcare spending is 17.3% of GDP — highest among developed nations",
+      "Electronic health record adoption has reached 96% among hospitals",
+    ]
+  },
+  {
+    topic: "The future of work",
+    prompt: "Discuss the skills that will matter most in the next decade.",
+    facts: [
+      "85 million jobs may be displaced by automation by 2025",
+      "97 million new roles are expected to emerge from the AI shift",
+      "The half-life of professional skills has dropped from 10 years to 5",
+      "Only 21% of workers believe their company invests adequately in reskilling",
+    ]
+  },
+];
+
+// ===== LISTENING COMPREHENSION PASSAGES =====
+const LISTENING_PASSAGES = [
+  {
+    title: "The Network Effects Trap",
+    passage: "Network effects are often cited as the strongest competitive moat in technology. The logic seems simple: as more users join a platform, it becomes more valuable to each user, creating a self-reinforcing cycle. But this narrative obscures a critical vulnerability. The same dynamics that create network effects can work in reverse. When users begin to leave — perhaps due to declining content quality, privacy concerns, or a superior alternative — the platform's value erodes for everyone who remains. MySpace had powerful network effects in 2007. So did BlackBerry's BBM. The lesson isn't that network effects don't matter. They do. The lesson is that they are necessary but not sufficient. The companies that endure combine network effects with high switching costs, continuous product innovation, and careful stewardship of user trust. Without those reinforcing factors, a network effect can unwind faster than it was built.",
+    question: "Do you agree that network effects alone are insufficient as a competitive moat? Why or why not?",
+  },
+  {
+    title: "The Paradox of Expertise",
+    passage: "In complex systems — whether markets, organizations, or geopolitics — deep expertise can become a liability. Experts develop sophisticated mental models that work well under normal conditions. But when conditions shift in unprecedented ways, those models can blind experts to novel possibilities. Philip Tetlock's research on forecasting found that 'foxes' — thinkers who draw on multiple disciplines and remain comfortable with ambiguity — consistently outperformed 'hedgehogs' — deep specialists who view the world through a single lens. The implication is not that expertise is worthless, but that the most effective thinkers pair deep knowledge with intellectual humility and a willingness to update their views. In investing, this manifests as the tension between conviction and flexibility — holding strong views loosely enough to abandon them when the evidence changes.",
+    question: "How should professionals balance deep expertise with intellectual flexibility?",
+  },
+  {
+    title: "The Compliance Burden Opportunity",
+    passage: "Regulatory compliance is typically viewed as a cost center — something companies endure rather than embrace. But in sectors like financial services, healthcare, and education, the growing complexity of compliance requirements has created a significant opportunity for software companies. Organizations now spend an average of 10,000 hours per year on compliance activities. Much of this work is repetitive, error-prone, and poorly suited to manual processes. Companies like Veeva in life sciences and Workiva in financial reporting have built multi-billion dollar businesses by transforming compliance from a painful manual process into an automated workflow. The key insight is that compliance requirements tend to increase over time, never decrease. This creates a natural tailwind for vendors who embed themselves into compliance workflows. Switching costs are extraordinarily high because changing systems means re-validating compliance — something regulated companies are reluctant to do.",
+    question: "What makes compliance-focused software companies attractive as long-term investments?",
+  },
+  {
+    title: "Decision Fatigue and Leadership",
+    passage: "A study of Israeli judges found that the probability of a favorable parole ruling dropped from 65% to nearly zero over the course of a decision session, then reset to 65% after a break. The judges weren't biased — they were depleted. Decision fatigue is one of the most underappreciated forces in organizational life. Leaders make hundreds of decisions daily, from strategic priorities to personnel issues. As their cognitive reserves deplete, they default to the safest option — which is usually the status quo or saying no. The best leaders design their environments to protect their decision-making capacity. They establish routines that eliminate trivial choices, delegate categories of decisions entirely, and schedule their most important decisions for times of peak cognitive capacity. Steve Jobs wore the same outfit every day. Jeff Bezos scheduled high-IQ meetings before lunch. These aren't quirks — they're cognitive load management strategies.",
+    question: "How should leaders structure their decision-making to avoid fatigue-driven errors?",
+  },
+  {
+    title: "The Unbundling of Education",
+    passage: "For centuries, universities have bundled four distinct products: education, credentialing, social networking, and a coming-of-age experience. This bundle has remained intact because no alternative could replicate all four simultaneously. But that is beginning to change. Online platforms now deliver education at scale. Industry certifications and portfolio-based assessment are emerging as credential alternatives. Professional networks like LinkedIn replicate the alumni network. The only piece of the bundle that remains truly defensible is the residential social experience — and that alone cannot justify $80,000 per year. The most vulnerable institutions are those in the middle: not prestigious enough for the brand premium, not affordable enough to compete on price, and not distinctive enough to justify the residential experience. The institutions that will thrive are those that either dominate on brand, radically reduce cost, or reinvent the bundle entirely around outcomes like guaranteed employment.",
+    question: "Which parts of the higher education bundle are most vulnerable to disruption?",
+  },
+];
+
+// ===== INTERRUPTION QUESTIONS =====
+const INTERRUPTIONS = [
+  "Can you give a specific example of that?",
+  "What would someone who disagrees with you say?",
+  "How does this apply to a small company vs. a large one?",
+  "What's the biggest risk with your argument?",
+  "How would you explain this to someone outside your industry?",
+  "What changed your mind about this topic — or what could?",
+  "How would you measure whether you're right about this?",
+  "What's the most common misconception about this?",
+  "If you had to summarize your point in one sentence, what would it be?",
+  "How does this compare to what we saw 10 years ago?",
+  "Who benefits most from this, and who loses?",
+  "What would you do differently if you had unlimited resources?",
+  "How confident are you in this position, on a scale of 1-10?",
+  "What data would change your view?",
+  "How does this play out internationally vs. just in the US?",
+];
+
+const FILLER_WORDS = [
+  'um', 'uh', 'uhh', 'umm', 'hmm', 'like', 'you know', 'basically',
+  'actually', 'right', 'so yeah', 'i mean', 'kind of', 'sort of',
+  'literally', 'honestly', 'obviously', 'anyway', 'whatever',
+  'you see', 'i guess'
+];
+
+const FRAMEWORK_GUIDES = {
+  prep: {
+    name: 'PREP',
+    steps: [
+      { label: 'Point', hint: 'State your main position clearly', signals: ['i believe', 'my view is', 'the key point is', 'i think', 'my position is'] },
+      { label: 'Reason', hint: 'Explain why you hold this view', signals: ['because', 'the reason', 'this matters because', 'this is important because', 'why'] },
+      { label: 'Example', hint: 'Give a concrete example or story', signals: ['for example', 'for instance', 'consider', 'take the case', 'imagine', 'look at', 'such as', 'one example', 'a good example'] },
+      { label: 'Point', hint: 'Restate your position to close', signals: ["that's why", 'in conclusion', 'so ultimately', 'to sum up', 'this is why', 'and that is why', 'in short'] },
+    ]
+  },
+  wsn: {
+    name: 'What / So What / Now What',
+    steps: [
+      { label: 'What', hint: 'State the facts or situation', signals: ['what happened', 'the situation is', 'the fact is', 'we are seeing', 'currently', 'right now'] },
+      { label: 'So What', hint: 'Explain why it matters', signals: ['this matters because', 'the implication', 'what this means', 'the impact', 'so what this tells us', 'the significance'] },
+      { label: 'Now What', hint: 'Recommend next steps', signals: ['going forward', 'we should', 'the next step', 'i recommend', 'what we need to do', 'the action here'] },
+    ]
+  },
+  ppf: {
+    name: 'Past / Present / Future',
+    steps: [
+      { label: 'Past', hint: 'Historical context — where we came from', signals: ['historically', 'in the past', 'used to', 'years ago', 'previously', 'traditionally', 'back when'] },
+      { label: 'Present', hint: 'Current state — where we are now', signals: ['today', 'currently', 'right now', 'at present', 'now we see', 'what we are seeing'] },
+      { label: 'Future', hint: 'Your prediction or recommendation', signals: ['going forward', 'in the future', 'will', 'i predict', 'expect', 'looking ahead', 'the trend suggests'] },
+    ]
+  },
+  psb: {
+    name: 'Problem / Solution / Benefit',
+    steps: [
+      { label: 'Problem', hint: 'Name the pain point', signals: ['the problem', 'the challenge', 'the issue', 'what we struggle with', 'the pain point', 'the difficulty'] },
+      { label: 'Solution', hint: 'Present your fix', signals: ['the solution', 'the fix', 'the answer', 'what we can do', 'the approach', 'to address this', 'we should'] },
+      { label: 'Benefit', hint: 'Paint the better future', signals: ['the benefit', 'the result', 'this means', 'the outcome', 'what this gives us', 'the advantage'] },
+    ]
+  },
+  arev: {
+    name: 'AREV',
+    steps: [
+      { label: 'Answer', hint: 'Give a direct answer', signals: ['yes', 'no', 'absolutely', 'my answer is', 'the short answer', 'i believe'] },
+      { label: 'Reason', hint: 'Explain your reasoning', signals: ['because', 'the reason', 'here is why', 'this is due to', 'the logic'] },
+      { label: 'Evidence', hint: 'Back it up with proof', signals: ['for example', 'the data shows', 'research shows', 'evidence suggests', 'studies show', 'in my experience'] },
+      { label: 'Verdict', hint: 'Summarize with confidence', signals: ['so', 'therefore', 'in conclusion', 'ultimately', 'the bottom line'] },
+    ]
+  },
+};
+
+const CATEGORY_NAMES = {
+  all: 'All Categories',
+  general: 'General',
+  business: 'Business',
+  tech: 'Technology',
+  abstract: 'Abstract',
+  debate: 'Debate',
+  explain: 'Explain',
+};
+
+// ===== STATE =====
+let drillState = null;
+let timerInterval = null;
+let recognition = null;
+let fullTranscript = '';
+let interimText = '';
+let wordCount = 0;
+let speakingStartTime = null;
+let speakingElapsed = 0;
+let currentMode = 'standard';
+let mediaRecorder = null;
+let audioChunks = [];
+let recordedAudioURL = null;
+let audienceAudioCtx = null;
+let audienceNoiseNode = null;
+let audienceGain = null;
+let interruptionTimers = [];
+let interruptionCount = 0;
+let pauseTimestamps = [];
+let lastSpeechTime = null;
+let longPauses = 0;
+
+// ===== TAB NAVIGATION =====
+document.querySelectorAll('nav button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('main > section').forEach(s => s.classList.add('section-hidden'));
+    document.getElementById('tab-' + btn.dataset.tab).classList.remove('section-hidden');
+    if (btn.dataset.tab === 'history') { renderHistory(); renderStrengthBars(); }
+  });
+});
+
+function toggleFrameworkDetail(card) {
+  card.querySelector('.framework-detail').classList.toggle('section-hidden');
+}
+
+// ===== MODE SELECTION =====
+function selectMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
+}
+
+// ===== SPACED REPETITION =====
+function getCategoryScores() {
+  try {
+    return JSON.parse(localStorage.getItem('speaking-coach-category-scores') || '{}');
+  } catch { return {}; }
+}
+
+function updateCategoryScore(category, score) {
+  const scores = getCategoryScores();
+  if (!scores[category]) scores[category] = { total: 0, count: 0 };
+  scores[category].total += score;
+  scores[category].count += 1;
+  localStorage.setItem('speaking-coach-category-scores', JSON.stringify(scores));
+}
+
+function getWeightedCategory() {
+  const scores = getCategoryScores();
+  const categories = Object.keys(PROMPTS);
+  const weights = categories.map(cat => {
+    const data = scores[cat];
+    if (!data || data.count === 0) return 3; // Unknown = high weight
+    const avg = data.total / data.count;
+    if (avg >= 80) return 1;
+    if (avg >= 60) return 2;
+    if (avg >= 40) return 3;
+    return 4;
+  });
+  const totalWeight = weights.reduce((a, b) => a + b, 0);
+  let r = Math.random() * totalWeight;
+  for (let i = 0; i < categories.length; i++) {
+    r -= weights[i];
+    if (r <= 0) return categories[i];
+  }
+  return categories[categories.length - 1];
+}
+
+function getRandomPrompt(category) {
+  let actualCategory = category;
+  if (category === 'all') {
+    actualCategory = getWeightedCategory();
+  }
+  const pool = PROMPTS[actualCategory];
+  const prompt = pool[Math.floor(Math.random() * pool.length)];
+  return { prompt, actualCategory };
+}
+
+// ===== DRILL LOGIC =====
+function showSetup() {
+  document.getElementById('drill-setup').classList.remove('section-hidden');
+  document.getElementById('drill-active').classList.add('section-hidden');
+  document.getElementById('drill-results').classList.add('section-hidden');
+  stopAudienceAudio();
+  document.getElementById('audience-bar').classList.add('section-hidden');
+}
+
+function startDrill() {
+  const category = document.getElementById('category').value;
+  const framework = document.getElementById('framework').value;
+  const prepTime = parseInt(document.getElementById('prep-time').value) || 0;
+  const speakTime = parseInt(document.getElementById('speak-time').value) || 90;
+  const audienceOn = document.getElementById('audience-toggle').checked;
+  const interruptOn = document.getElementById('interrupt-toggle').checked;
+
+  let prompt, actualCategory, facts = null, passage = null, passageQuestion = null;
+
+  if (currentMode === 'recall') {
+    const set = FACT_RECALL_SETS[Math.floor(Math.random() * FACT_RECALL_SETS.length)];
+    prompt = set.prompt;
+    facts = set.facts;
+    actualCategory = category === 'all' ? 'business' : category;
+  } else if (currentMode === 'listening') {
+    const p = LISTENING_PASSAGES[Math.floor(Math.random() * LISTENING_PASSAGES.length)];
+    passage = p.passage;
+    passageQuestion = p.question;
+    prompt = p.question;
+    actualCategory = category === 'all' ? 'business' : category;
+  } else {
+    const result = getRandomPrompt(category);
+    prompt = result.prompt;
+    actualCategory = result.actualCategory;
+  }
+
+  const keyPoints = generateKeyPoints(prompt);
+
+  drillState = {
+    category, actualCategory, framework, prepTime, speakTime, prompt, keyPoints,
+    phase: 'prep', remaining: prepTime, audienceOn, interruptOn,
+    mode: currentMode, facts, passage, passageQuestion,
+    factsVisible: currentMode === 'recall',
+    passageVisible: currentMode === 'listening',
+  };
+
+  fullTranscript = '';
+  interimText = '';
+  wordCount = 0;
+  speakingElapsed = 0;
+  interruptionCount = 0;
+  longPauses = 0;
+  pauseTimestamps = [];
+  lastSpeechTime = null;
+  audioChunks = [];
+  recordedAudioURL = null;
+  interruptionTimers.forEach(t => clearTimeout(t));
+  interruptionTimers = [];
+
+  document.getElementById('drill-setup').classList.add('section-hidden');
+  document.getElementById('drill-results').classList.add('section-hidden');
+  document.getElementById('drill-active').classList.remove('section-hidden');
+  document.getElementById('interruption-overlay').classList.add('section-hidden');
+
+  document.getElementById('prompt-text').textContent = prompt;
+  document.getElementById('transcript').innerHTML = '<span style="color:var(--text2);">Transcript will appear here when speaking begins...</span>';
+  document.getElementById('transcript-area').classList.add('section-hidden');
+
+  // Facts area
+  const factsArea = document.getElementById('facts-area');
+  if (currentMode === 'recall' && facts) {
+    factsArea.innerHTML = '<div class="facts-display"><h4>Memorize These Facts (visible during prep only)</h4>' +
+      facts.map(f => '<div class="fact-item">' + f + '</div>').join('') + '</div>';
+    factsArea.classList.remove('section-hidden');
+  } else {
+    factsArea.classList.add('section-hidden');
+  }
+
+  // Passage area
+  const passageArea = document.getElementById('passage-area');
+  if (currentMode === 'listening' && passage) {
+    passageArea.innerHTML = '<div class="passage-display">' + passage + '</div>';
+    passageArea.classList.remove('section-hidden');
+  } else {
+    passageArea.classList.add('section-hidden');
+  }
+
+  // Key points (show during prep)
+  const kpDisplay = document.getElementById('key-points-display');
+  const kpList = document.getElementById('key-points-list');
+  if (currentMode === 'standard') {
+    kpList.innerHTML = keyPoints.map(p => '<div style="font-size:14px; padding:4px 0; color:var(--text2);">• ' + p + '</div>').join('');
+    kpDisplay.classList.remove('section-hidden');
+  } else {
+    kpDisplay.classList.add('section-hidden');
+  }
+
+  // Framework guide
+  const guideEl = document.getElementById('framework-guide');
+  if (framework !== 'none' && FRAMEWORK_GUIDES[framework]) {
+    const fw = FRAMEWORK_GUIDES[framework];
+    guideEl.innerHTML = '<strong>' + fw.name + '</strong><br>' +
+      fw.steps.map((s, i) => `<strong>${i + 1}. ${s.label}:</strong> ${s.hint}`).join('<br>');
+    guideEl.classList.remove('section-hidden');
+  } else {
+    guideEl.classList.add('section-hidden');
+  }
+
+  // Audience
+  if (audienceOn) {
+    showAudience();
+  } else {
+    document.getElementById('audience-bar').classList.add('section-hidden');
+  }
+
+  if (prepTime === 0) {
+    startSpeakingPhase();
+  } else {
+    drillState.phase = 'prep';
+    drillState.remaining = prepTime;
+    document.getElementById('phase-label').textContent =
+      currentMode === 'recall' ? 'MEMORIZE' :
+      currentMode === 'listening' ? 'READ & ABSORB' : 'PREPARE';
+    document.getElementById('phase-label').className = 'phase-label prep-color';
+    document.getElementById('skip-btn').textContent = 'Skip to Speaking';
+    document.getElementById('skip-btn').classList.remove('section-hidden');
+    updateTimerDisplay();
+    timerInterval = setInterval(tick, 1000);
+  }
+}
+
+function startSpeakingPhase() {
+  drillState.phase = 'speaking';
+  drillState.remaining = drillState.speakTime;
+  speakingStartTime = Date.now();
+  lastSpeechTime = Date.now();
+
+  document.getElementById('phase-label').textContent = 'SPEAK NOW';
+  document.getElementById('phase-label').className = 'phase-label speaking-color';
+  document.getElementById('skip-btn').textContent = 'Finish Early';
+  document.getElementById('transcript-area').classList.remove('section-hidden');
+
+  // Hide facts in recall mode
+  if (drillState.mode === 'recall') {
+    const factsArea = document.getElementById('facts-area');
+    factsArea.innerHTML = '<div class="facts-hidden-msg">Facts are now hidden. Speak and try to reference them from memory.</div>';
+  }
+
+  // Hide passage in listening mode
+  if (drillState.mode === 'listening') {
+    const passageArea = document.getElementById('passage-area');
+    passageArea.innerHTML = '<div class="facts-hidden-msg">Passage is now hidden. Summarize and respond from memory.</div>';
+  }
+
+  // Hide key points during speaking
+  document.getElementById('key-points-display').classList.add('section-hidden');
+
+  updateTimerDisplay();
+
+  if (!timerInterval) {
+    timerInterval = setInterval(tick, 1000);
+  }
+
+  startRecognition();
+  startAudioRecording();
+
+  if (drillState.audienceOn) {
+    startAudienceAudio();
+  }
+
+  // Schedule interruptions
+  if (drillState.interruptOn) {
+    scheduleInterruptions();
+  }
+}
+
+function tick() {
+  if (!drillState) return;
+  drillState.remaining--;
+  updateTimerDisplay();
+
+  // Track pauses
+  if (drillState.phase === 'speaking' && lastSpeechTime) {
+    const gap = Date.now() - lastSpeechTime;
+    if (gap > 3000) {
+      // Check we haven't already counted this pause
+      const lastPause = pauseTimestamps[pauseTimestamps.length - 1];
+      if (!lastPause || (Date.now() - lastPause) > 3000) {
+        longPauses++;
+        pauseTimestamps.push(Date.now());
+      }
+    }
+  }
+
+  if (drillState.remaining <= 0) {
+    if (drillState.phase === 'prep') {
+      startSpeakingPhase();
+    } else {
+      finishDrill();
+    }
+  }
+}
+
+function updateTimerDisplay() {
+  const mins = Math.floor(drillState.remaining / 60);
+  const secs = drillState.remaining % 60;
+  document.getElementById('timer').textContent = mins + ':' + String(secs).padStart(2, '0');
+
+  if (drillState.remaining <= 10 && drillState.phase === 'speaking') {
+    document.getElementById('timer').style.color = 'var(--red)';
+  } else if (drillState.phase === 'prep') {
+    document.getElementById('timer').style.color = 'var(--yellow)';
+  } else {
+    document.getElementById('timer').style.color = 'var(--green)';
+  }
+}
+
+function skipPhase() {
+  if (drillState.phase === 'prep') {
+    startSpeakingPhase();
+  } else {
+    finishDrill();
+  }
+}
+
+function endDrill() {
+  stopRecognition();
+  stopAudioRecording();
+  stopAudienceAudio();
+  clearInterval(timerInterval);
+  timerInterval = null;
+  interruptionTimers.forEach(t => clearTimeout(t));
+  interruptionTimers = [];
+  drillState = null;
+  document.getElementById('audience-bar').classList.add('section-hidden');
+  document.getElementById('interruption-overlay').classList.add('section-hidden');
+  showSetup();
+}
+
+function finishDrill() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  interruptionTimers.forEach(t => clearTimeout(t));
+  interruptionTimers = [];
+
+  if (speakingStartTime) {
+    speakingElapsed = (Date.now() - speakingStartTime) / 1000;
+  }
+
+  stopRecognition();
+  stopAudioRecording();
+  stopAudienceAudio();
+  document.getElementById('audience-bar').classList.add('section-hidden');
+  document.getElementById('interruption-overlay').classList.add('section-hidden');
+
+  setTimeout(() => showResults(), 500);
+}
+
+// ===== INTERRUPTIONS =====
+function scheduleInterruptions() {
+  const speakTime = drillState.speakTime;
+  // 1-3 interruptions depending on duration
+  const count = speakTime >= 120 ? Math.floor(Math.random() * 2) + 2 : 1;
+  for (let i = 0; i < count; i++) {
+    const minTime = Math.floor(speakTime * 0.2);
+    const maxTime = Math.floor(speakTime * 0.8);
+    const delay = (minTime + Math.floor(Math.random() * (maxTime - minTime))) * 1000;
+    const timer = setTimeout(() => {
+      if (drillState && drillState.phase === 'speaking') {
+        showInterruption();
+      }
+    }, delay + (i * 15000)); // Space them at least 15s apart
+    interruptionTimers.push(timer);
+  }
+}
+
+function showInterruption() {
+  const question = INTERRUPTIONS[Math.floor(Math.random() * INTERRUPTIONS.length)];
+  document.getElementById('interrupt-question').textContent = question;
+  document.getElementById('interruption-overlay').classList.remove('section-hidden');
+  interruptionCount++;
+}
+
+function dismissInterruption() {
+  document.getElementById('interruption-overlay').classList.add('section-hidden');
+}
+
+// ===== AUDIENCE MODE =====
+function showAudience() {
+  const bar = document.getElementById('audience-bar');
+  let html = '';
+  const count = 15 + Math.floor(Math.random() * 10);
+  for (let i = 0; i < count; i++) {
+    const hue = Math.floor(Math.random() * 360);
+    const opacity = 0.3 + Math.random() * 0.5;
+    html += `<div class="audience-figure" style="opacity:${opacity}">
+      <div class="head" style="background:hsl(${hue},30%,60%)"></div>
+      <div class="body" style="background:hsl(${hue},30%,50%)"></div>
+    </div>`;
+  }
+  bar.innerHTML = html;
+  bar.classList.remove('section-hidden');
+}
+
+function startAudienceAudio() {
+  try {
+    audienceAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // Create brown noise for ambient crowd murmur
+    const bufferSize = audienceAudioCtx.sampleRate * 2;
+    const buffer = audienceAudioCtx.createBuffer(1, bufferSize, audienceAudioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    let lastOut = 0;
+    for (let i = 0; i < bufferSize; i++) {
+      const white = Math.random() * 2 - 1;
+      data[i] = (lastOut + (0.02 * white)) / 1.02;
+      lastOut = data[i];
+      data[i] *= 3.5; // Amplify
+    }
+    audienceNoiseNode = audienceAudioCtx.createBufferSource();
+    audienceNoiseNode.buffer = buffer;
+    audienceNoiseNode.loop = true;
+
+    // Bandpass filter to sound more like crowd murmur
+    const filter = audienceAudioCtx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 400;
+    filter.Q.value = 0.5;
+
+    audienceGain = audienceAudioCtx.createGain();
+    audienceGain.gain.value = 0.08; // Subtle
+
+    audienceNoiseNode.connect(filter);
+    filter.connect(audienceGain);
+    audienceGain.connect(audienceAudioCtx.destination);
+    audienceNoiseNode.start();
+  } catch (e) {
+    console.warn('Could not start audience audio:', e);
+  }
+}
+
+function stopAudienceAudio() {
+  try {
+    if (audienceNoiseNode) { audienceNoiseNode.stop(); audienceNoiseNode = null; }
+    if (audienceAudioCtx) { audienceAudioCtx.close(); audienceAudioCtx = null; }
+  } catch (e) {}
+}
+
+// ===== AUDIO RECORDING =====
+function startAudioRecording() {
+  audioChunks = [];
+  recordedAudioURL = null;
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) audioChunks.push(e.data);
+    };
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(audioChunks, { type: 'audio/webm' });
+      recordedAudioURL = URL.createObjectURL(blob);
+      stream.getTracks().forEach(t => t.stop());
+    };
+    mediaRecorder.start();
+  }).catch(e => {
+    console.warn('Could not start audio recording:', e);
+  });
+}
+
+function stopAudioRecording() {
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    try { mediaRecorder.stop(); } catch (e) {}
+  }
+}
+
+// ===== SPEECH RECOGNITION =====
+function startRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    document.getElementById('transcript').innerHTML =
+      '<span style="color:var(--yellow);">Speech recognition is not supported in this browser. Try Chrome or Edge.</span>';
+    document.getElementById('mic-indicator').style.display = 'none';
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  recognition.onresult = (event) => {
+    let interim = '';
+    let final = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      if (event.results[i].isFinal) {
+        final += event.results[i][0].transcript + ' ';
+      } else {
+        interim += event.results[i][0].transcript;
+      }
+    }
+
+    if (final) {
+      fullTranscript += final;
+      lastSpeechTime = Date.now();
+    }
+    if (interim) {
+      lastSpeechTime = Date.now();
+    }
+    interimText = interim;
+    renderTranscript();
+  };
+
+  recognition.onerror = (event) => {
+    if (event.error === 'no-speech') return;
+    console.warn('Speech recognition error:', event.error);
+  };
+
+  recognition.onend = () => {
+    if (drillState && drillState.phase === 'speaking') {
+      try { recognition.start(); } catch(e) {}
+    }
+  };
+
+  try { recognition.start(); } catch(e) { console.warn('Could not start recognition:', e); }
+}
+
+function stopRecognition() {
+  if (recognition) {
+    try { recognition.stop(); } catch(e) {}
+    recognition = null;
+  }
+}
+
+function renderTranscript() {
+  const el = document.getElementById('transcript');
+  let html = highlightFillers(fullTranscript);
+  if (interimText) {
+    html += '<span class="interim">' + escapeHtml(interimText) + '</span>';
+  }
+  el.innerHTML = html || '<span style="color:var(--text2);">Listening...</span>';
+  el.scrollTop = el.scrollHeight;
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function highlightFillers(text) {
+  if (!text) return '';
+  let result = escapeHtml(text);
+  const sorted = [...FILLER_WORDS].sort((a, b) => b.length - a.length);
+  sorted.forEach(filler => {
+    const regex = new RegExp('\\b(' + filler.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')\\b', 'gi');
+    result = result.replace(regex, '<span class="filler">$1</span>');
+  });
+  return result;
+}
+
+// ===== SENTENCE ANALYSIS =====
+function analyzeSentences(text) {
+  if (!text) return { sentences: [], longCount: 0, avgLength: 0 };
+  // Split on sentence-ending punctuation or long pauses (approximated by looking at chunks)
+  const sentences = text.split(/[.!?]+/).map(s => s.trim()).filter(s => s.length > 0);
+  const lengths = sentences.map(s => s.split(/\s+/).filter(w => w.length > 0).length);
+  const longCount = lengths.filter(l => l > 30).length;
+  const avgLength = lengths.length > 0 ? Math.round(lengths.reduce((a, b) => a + b, 0) / lengths.length) : 0;
+  return { sentences, lengths, longCount, avgLength };
+}
+
+function highlightLongSentences(text) {
+  if (!text) return '';
+  const sentences = text.split(/([.!?]+)/).filter(s => s.length > 0);
+  let result = '';
+  for (let i = 0; i < sentences.length; i++) {
+    const s = sentences[i];
+    if (/^[.!?]+$/.test(s)) {
+      result += escapeHtml(s);
+      continue;
+    }
+    const wordCount = s.trim().split(/\s+/).filter(w => w.length > 0).length;
+    let chunk = highlightFillers(s);
+    if (wordCount > 30) {
+      chunk = '<span class="long-sentence" title="' + wordCount + ' words — try breaking this up">' + chunk + '</span>';
+    }
+    result += chunk;
+  }
+  return result;
+}
+
+// ===== FRAMEWORK SCORING =====
+function scoreFramework(text, frameworkKey) {
+  if (!text || !frameworkKey || frameworkKey === 'none') return null;
+  const fw = FRAMEWORK_GUIDES[frameworkKey];
+  if (!fw) return null;
+
+  const lower = text.toLowerCase();
+  const totalLength = lower.length;
+  const results = [];
+
+  fw.steps.forEach((step, idx) => {
+    let found = false;
+    let position = totalLength;
+    for (const signal of step.signals) {
+      const pos = lower.indexOf(signal);
+      if (pos !== -1) {
+        found = true;
+        position = Math.min(position, pos);
+      }
+    }
+    results.push({
+      label: step.label,
+      found,
+      position: found ? position : -1,
+      hint: step.hint,
+    });
+  });
+
+  // Check ordering
+  let inOrder = true;
+  let lastPos = -1;
+  for (const r of results) {
+    if (r.found) {
+      if (r.position < lastPos) inOrder = false;
+      lastPos = r.position;
+    }
+  }
+
+  const stepsHit = results.filter(r => r.found).length;
+  const totalSteps = results.length;
+  const score = Math.round((stepsHit / totalSteps) * 100);
+
+  return { results, inOrder, stepsHit, totalSteps, score, name: fw.name };
+}
+
+// ===== RESULTS =====
+function showResults() {
+  document.getElementById('drill-active').classList.add('section-hidden');
+  document.getElementById('drill-results').classList.remove('section-hidden');
+
+  const text = fullTranscript.trim();
+  const words = text ? text.split(/\s+/).filter(w => w.length > 0) : [];
+  wordCount = words.length;
+
+  // Count fillers
+  let fillerCount = 0;
+  const lowerText = ' ' + text.toLowerCase() + ' ';
+  FILLER_WORDS.forEach(filler => {
+    const regex = new RegExp('\\b' + filler.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi');
+    const matches = lowerText.match(regex);
+    if (matches) fillerCount += matches.length;
+  });
+
+  // WPM
+  const minutes = speakingElapsed / 60;
+  const wpm = minutes > 0 ? Math.round(wordCount / minutes) : 0;
+
+  // Sentence analysis
+  const sentenceAnalysis = analyzeSentences(text);
+
+  // Framework scoring
+  const frameworkResult = drillState ? scoreFramework(text, drillState.framework) : null;
+
+  // Score calculation
+  let score = 100;
+  score -= fillerCount * 3;
+  if (wpm > 0) {
+    if (wpm < 100) score -= 10;
+    else if (wpm < 120) score -= 5;
+    else if (wpm > 180) score -= 10;
+    else if (wpm > 160) score -= 5;
+  }
+  const expectedWords = (drillState ? drillState.speakTime : 90) / 60 * 140 * 0.4;
+  if (wordCount < expectedWords && wordCount > 0) score -= 10;
+  if (wordCount === 0) score = 0;
+  score -= sentenceAnalysis.longCount * 3;
+  score -= Math.min(longPauses, 5) * 3;
+  if (frameworkResult) {
+    const fwPenalty = Math.round((1 - frameworkResult.stepsHit / frameworkResult.totalSteps) * 15);
+    score -= fwPenalty;
+    if (!frameworkResult.inOrder && frameworkResult.stepsHit > 1) score -= 5;
+  }
+  score = Math.max(0, Math.min(100, score));
+
+  // Display stats
+  const wpmEl = document.getElementById('res-wpm');
+  wpmEl.textContent = wpm;
+  wpmEl.className = 'stat-value ' + (wpm >= 120 && wpm <= 160 ? 'score-excellent' : wpm >= 100 && wpm <= 180 ? 'score-good' : 'score-needs-work');
+
+  const fillerEl = document.getElementById('res-fillers');
+  fillerEl.textContent = fillerCount;
+  fillerEl.className = 'stat-value ' + (fillerCount <= 2 ? 'score-excellent' : fillerCount <= 5 ? 'score-good' : fillerCount <= 8 ? 'score-needs-work' : 'score-poor');
+
+  document.getElementById('res-words').textContent = wordCount;
+
+  const pauseEl = document.getElementById('res-pauses');
+  pauseEl.textContent = longPauses;
+  pauseEl.className = 'stat-value ' + (longPauses <= 1 ? 'score-excellent' : longPauses <= 3 ? 'score-good' : 'score-needs-work');
+
+  const longSentEl = document.getElementById('res-long-sent');
+  longSentEl.textContent = sentenceAnalysis.longCount;
+  longSentEl.className = 'stat-value ' + (sentenceAnalysis.longCount === 0 ? 'score-excellent' : sentenceAnalysis.longCount <= 2 ? 'score-good' : 'score-needs-work');
+
+  const scoreEl = document.getElementById('res-score');
+  scoreEl.textContent = score;
+  scoreEl.className = 'stat-value ' + (score >= 80 ? 'score-excellent' : score >= 60 ? 'score-good' : score >= 40 ? 'score-needs-work' : 'score-poor');
+
+  // Audio playback
+  const audioSection = document.getElementById('audio-playback');
+  if (recordedAudioURL) {
+    document.getElementById('audio-player').src = recordedAudioURL;
+    audioSection.classList.remove('section-hidden');
+  } else {
+    audioSection.classList.add('section-hidden');
+  }
+
+  // Prompt recall
+  document.getElementById('prompt-recall').textContent = 'Prompt: "' + (drillState ? drillState.prompt : '') + '"';
+
+  // Key points self-check
+  const kpCheck = document.getElementById('key-points-check');
+  const kpChecklist = document.getElementById('key-points-checklist');
+  if (drillState && drillState.keyPoints && wordCount > 0) {
+    kpChecklist.innerHTML = drillState.keyPoints.map((p, i) =>
+      '<label><input type="checkbox" id="kp-' + i + '"> ' + p + '</label>'
+    ).join('');
+    kpCheck.classList.remove('section-hidden');
+  } else {
+    kpCheck.classList.add('section-hidden');
+  }
+
+  // Feedback
+  const feedbackEl = document.getElementById('feedback-section');
+  let feedbackHTML = '<h3>Feedback</h3>';
+
+  if (wordCount === 0) {
+    feedbackHTML += '<div class="feedback-item">No transcript detected. Make sure your microphone is enabled, or try Chrome/Edge for best speech recognition support.</div>';
+  } else {
+    // Pace
+    if (wpm < 100) {
+      feedbackHTML += '<div class="feedback-item"><div class="label">Pace</div>Your speaking pace was slow (' + wpm + ' WPM). Aim for 130-160 WPM. A faster pace sounds more confident.</div>';
+    } else if (wpm > 180) {
+      feedbackHTML += '<div class="feedback-item"><div class="label">Pace</div>You were speaking quite fast (' + wpm + ' WPM). Slow down to 130-160 WPM. Pausing between key points sounds more deliberate.</div>';
+    } else if (wpm >= 130 && wpm <= 160) {
+      feedbackHTML += '<div class="feedback-item"><div class="label">Pace</div>Great pace (' + wpm + ' WPM). You\'re in the ideal conversational range.</div>';
+    } else {
+      feedbackHTML += '<div class="feedback-item"><div class="label">Pace</div>Decent pace (' + wpm + ' WPM). Close to the ideal 130-160 WPM range.</div>';
+    }
+
+    // Fillers
+    if (fillerCount === 0) {
+      feedbackHTML += '<div class="feedback-item"><div class="label">Filler Words</div>No filler words detected. Excellent discipline.</div>';
+    } else if (fillerCount <= 3) {
+      feedbackHTML += '<div class="feedback-item"><div class="label">Filler Words</div>Only ' + fillerCount + ' filler word(s). Good control. A brief pause always sounds better than "um."</div>';
+    } else {
+      feedbackHTML += '<div class="feedback-item"><div class="label">Filler Words</div>' + fillerCount + ' filler words detected. Replace these with pauses — silence sounds intentional.</div>';
+    }
+
+    // Pauses
+    if (longPauses === 0) {
+      feedbackHTML += '<div class="feedback-item"><div class="label">Pauses</div>No long pauses detected. Good flow throughout.</div>';
+    } else if (longPauses <= 2) {
+      feedbackHTML += '<div class="feedback-item"><div class="label">Pauses</div>' + longPauses + ' pause(s) over 3 seconds. A couple of deliberate pauses can be powerful — just make sure they\'re intentional, not because you lost your place.</div>';
+    } else {
+      feedbackHTML += '<div class="feedback-item"><div class="label">Pauses</div>' + longPauses + ' long pauses detected. This suggests you may be losing your thread. Having a framework to follow helps you always know what comes next.</div>';
+    }
+
+    // Sentence length
+    if (sentenceAnalysis.longCount > 0) {
+      feedbackHTML += '<div class="feedback-item"><div class="label">Sentence Length</div>' + sentenceAnalysis.longCount + ' sentence(s) over 30 words (avg: ' + sentenceAnalysis.avgLength + ' words/sentence). Long sentences signal you\'re thinking aloud. Put a period where you\'d put a comma. Highlighted in yellow in your transcript below.</div>';
+    } else if (sentenceAnalysis.avgLength > 0) {
+      feedbackHTML += '<div class="feedback-item"><div class="label">Sentence Length</div>Average sentence length: ' + sentenceAnalysis.avgLength + ' words. Good — short sentences signal clarity and confidence.</div>';
+    }
+
+    // Content volume
+    if (wordCount < expectedWords) {
+      feedbackHTML += '<div class="feedback-item"><div class="label">Content</div>You spoke ' + wordCount + ' words — try to fill more of the allotted time. A framework gives you sections to expand on when you run low on ideas.</div>';
+    }
+
+    // Framework scoring
+    if (frameworkResult) {
+      let fwHTML = '<div class="feedback-item"><div class="label">Framework (' + frameworkResult.name + ')</div>';
+      fwHTML += '<div style="margin:8px 0;">';
+      frameworkResult.results.forEach(r => {
+        const icon = r.found ? '<span style="color:var(--green);">&#10003;</span>' : '<span style="color:var(--red);">&#10007;</span>';
+        fwHTML += '<div style="padding:2px 0;">' + icon + ' <strong>' + r.label + '</strong>';
+        if (!r.found) fwHTML += ' — try using phrases like: "' + FRAMEWORK_GUIDES[drillState.framework].steps.find(s => s.label === r.label).signals.slice(0, 3).join('", "') + '"';
+        fwHTML += '</div>';
+      });
+      fwHTML += '</div>';
+      if (!frameworkResult.inOrder && frameworkResult.stepsHit > 1) {
+        fwHTML += '<div style="color:var(--yellow); font-size:13px; margin-top:4px;">Steps detected out of order. Try to follow the framework sequence for maximum clarity.</div>';
+      }
+      fwHTML += '<div style="margin-top:8px; font-size:13px; color:var(--text2);">Framework adherence: ' + frameworkResult.stepsHit + '/' + frameworkResult.totalSteps + ' steps detected</div>';
+      fwHTML += '</div>';
+      feedbackHTML += fwHTML;
+    }
+
+    // Mode-specific feedback
+    if (drillState && drillState.mode === 'recall') {
+      const factsUsed = drillState.facts ? drillState.facts.filter(f => {
+        const keywords = f.toLowerCase().split(/\s+/).filter(w => w.length > 4);
+        return keywords.some(kw => text.toLowerCase().includes(kw));
+      }).length : 0;
+      feedbackHTML += '<div class="feedback-item"><div class="label">Fact Recall</div>Approximately ' + factsUsed + ' of ' + (drillState.facts ? drillState.facts.length : 0) + ' facts referenced in your response. Try to weave facts naturally into your argument rather than listing them.</div>';
+    }
+
+    if (drillState && drillState.interruptOn && interruptionCount > 0) {
+      feedbackHTML += '<div class="feedback-item"><div class="label">Interruptions</div>You handled ' + interruptionCount + ' interruption(s). The key is to briefly address the follow-up, then smoothly transition back: "Coming back to my main point..."</div>';
+    }
+  }
+
+  feedbackEl.innerHTML = feedbackHTML;
+
+  // Final transcript with long sentence highlights
+  document.getElementById('final-transcript').innerHTML = highlightLongSentences(text) || '<span style="color:var(--text2);">No transcript recorded.</span>';
+
+  // Save to history
+  const actualCategory = drillState ? drillState.actualCategory : 'general';
+  saveSession({
+    date: new Date().toISOString(),
+    prompt: drillState ? drillState.prompt : '',
+    category: actualCategory,
+    framework: drillState ? drillState.framework : 'none',
+    mode: drillState ? drillState.mode : 'standard',
+    wpm,
+    fillers: fillerCount,
+    words: wordCount,
+    pauses: longPauses,
+    longSentences: sentenceAnalysis.longCount,
+    score,
+    duration: Math.round(speakingElapsed),
+  });
+
+  // Update category score for spaced repetition
+  updateCategoryScore(actualCategory, score);
+}
+
+// ===== HISTORY =====
+function getHistory() {
+  try {
+    return JSON.parse(localStorage.getItem('speaking-coach-history') || '[]');
+  } catch { return []; }
+}
+
+function saveSession(session) {
+  const history = getHistory();
+  history.unshift(session);
+  if (history.length > 200) history.length = 200;
+  localStorage.setItem('speaking-coach-history', JSON.stringify(history));
+}
+
+function clearHistory() {
+  if (confirm('Clear all practice history and category scores?')) {
+    localStorage.removeItem('speaking-coach-history');
+    localStorage.removeItem('speaking-coach-category-scores');
+    renderHistory();
+    renderStrengthBars();
+  }
+}
+
+function renderHistory() {
+  const history = getHistory();
+  const el = document.getElementById('history-content');
+
+  if (history.length === 0) {
+    el.innerHTML = '<div class="empty-state"><p>No practice sessions yet. Start a drill to begin tracking your progress.</p></div>';
+    return;
+  }
+
+  const avgWpm = Math.round(history.reduce((s, h) => s + h.wpm, 0) / history.length);
+  const avgFillers = (history.reduce((s, h) => s + h.fillers, 0) / history.length).toFixed(1);
+  const avgScore = Math.round(history.reduce((s, h) => s + h.score, 0) / history.length);
+  const totalSessions = history.length;
+
+  // Trend: last 5 vs previous 5
+  let trendHTML = '';
+  if (history.length >= 10) {
+    const recent5 = history.slice(0, 5).reduce((s, h) => s + h.score, 0) / 5;
+    const prev5 = history.slice(5, 10).reduce((s, h) => s + h.score, 0) / 5;
+    const diff = Math.round(recent5 - prev5);
+    if (diff > 0) trendHTML = '<span style="color:var(--green);">+' + diff + ' pts vs previous sessions</span>';
+    else if (diff < 0) trendHTML = '<span style="color:var(--red);">' + diff + ' pts vs previous sessions</span>';
+    else trendHTML = '<span style="color:var(--text2);">Steady</span>';
+  }
+
+  let html = '<div class="results-grid" style="margin-bottom:24px;">' +
+    '<div class="stat-card"><div class="stat-value">' + totalSessions + '</div><div class="stat-label">Sessions</div></div>' +
+    '<div class="stat-card"><div class="stat-value">' + avgWpm + '</div><div class="stat-label">Avg WPM</div></div>' +
+    '<div class="stat-card"><div class="stat-value">' + avgFillers + '</div><div class="stat-label">Avg Fillers</div></div>' +
+    '<div class="stat-card"><div class="stat-value">' + avgScore + '</div><div class="stat-label">Avg Score</div></div>' +
+    '</div>';
+
+  if (trendHTML) {
+    html += '<div style="text-align:center; margin-bottom:16px; font-size:14px;">Trend: ' + trendHTML + '</div>';
+  }
+
+  html += '<table class="history-table"><thead><tr><th>Date</th><th>Mode</th><th>Prompt</th><th>WPM</th><th>Fillers</th><th>Score</th></tr></thead><tbody>';
+
+  history.slice(0, 50).forEach(h => {
+    const date = new Date(h.date);
+    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const prompt = h.prompt.length > 40 ? h.prompt.substring(0, 40) + '...' : h.prompt;
+    const scoreBadge = h.score >= 80 ? 'badge-green' : h.score >= 50 ? 'badge-yellow' : 'badge-red';
+    const modeLabel = h.mode === 'recall' ? 'Recall' : h.mode === 'listening' ? 'Listen' : 'Std';
+
+    html += '<tr>' +
+      '<td>' + dateStr + '</td>' +
+      '<td><span class="badge badge-yellow" style="font-size:11px;">' + modeLabel + '</span></td>' +
+      '<td style="color:var(--text2);">' + prompt + '</td>' +
+      '<td>' + h.wpm + '</td>' +
+      '<td>' + h.fillers + '</td>' +
+      '<td><span class="badge ' + scoreBadge + '">' + h.score + '</span></td>' +
+      '</tr>';
+  });
+
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+function renderStrengthBars() {
+  const scores = getCategoryScores();
+  const el = document.getElementById('strength-bars');
+  const categories = Object.keys(PROMPTS);
+
+  let html = '';
+  categories.forEach(cat => {
+    const data = scores[cat];
+    const avg = data && data.count > 0 ? Math.round(data.total / data.count) : 0;
+    const count = data ? data.count : 0;
+    const color = avg >= 80 ? 'var(--green)' : avg >= 60 ? 'var(--yellow)' : avg >= 40 ? 'var(--orange)' : avg > 0 ? 'var(--red)' : 'var(--border)';
+
+    html += '<div class="strength-bar-row">' +
+      '<div class="strength-bar-label">' + (CATEGORY_NAMES[cat] || cat) + ' <span style="color:var(--text2); font-size:11px;">(' + count + ')</span></div>' +
+      '<div class="strength-bar-track"><div class="strength-bar-fill" style="width:' + avg + '%; background:' + color + ';"></div></div>' +
+      '<div class="strength-bar-value" style="color:' + color + ';">' + (avg > 0 ? avg : '—') + '</div>' +
+      '</div>';
+  });
+
+  el.innerHTML = html || '<p style="color:var(--text2); font-size:14px;">Complete some drills to see your category strengths.</p>';
+}
+
+// ===== PWA: Service Worker Registration =====
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(e => console.warn('SW registration failed:', e));
+}
+
+// ===== PWA: Install Prompt =====
+let deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  showInstallBanner();
+});
+
+function showInstallBanner() {
+  // Don't show if already installed or dismissed recently
+  if (window.matchMedia('(display-mode: standalone)').matches) return;
+  if (localStorage.getItem('speaking-coach-install-dismissed')) {
+    const dismissed = parseInt(localStorage.getItem('speaking-coach-install-dismissed'));
+    if (Date.now() - dismissed < 7 * 24 * 60 * 60 * 1000) return; // 7 days
+  }
+
+  const banner = document.createElement('div');
+  banner.id = 'install-banner';
+  banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--accent);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;z-index:200;gap:12px;';
+  banner.innerHTML = `
+    <div style="flex:1;">
+      <div style="font-weight:600;font-size:15px;">Install SpeakingCoach</div>
+      <div style="font-size:13px;color:var(--text2);">Add to your home screen for quick access</div>
+    </div>
+    <button class="btn btn-sm" onclick="doInstall()">Install</button>
+    <button class="btn btn-outline btn-sm" onclick="dismissInstall()">Later</button>
+  `;
+  document.body.appendChild(banner);
+}
+
+function doInstall() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(() => { deferredInstallPrompt = null; });
+  }
+  const banner = document.getElementById('install-banner');
+  if (banner) banner.remove();
+}
+
+function dismissInstall() {
+  localStorage.setItem('speaking-coach-install-dismissed', Date.now().toString());
+  const banner = document.getElementById('install-banner');
+  if (banner) banner.remove();
+}
+</script>
+</body>
+</html>
