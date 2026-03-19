@@ -617,7 +617,8 @@
 
   /* Mode selector */
   .mode-selector {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 8px;
     margin-bottom: 20px;
   }
@@ -715,13 +716,180 @@
     border-left: 2px solid var(--border);
   }
 
+  /* Streak display */
+  .streak-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--surface2);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+
+  .streak-fire { font-size: 20px; }
+  .streak-count { font-weight: 700; color: var(--orange); font-size: 18px; }
+  .streak-label { color: var(--text2); font-size: 13px; }
+
+  /* Hedge word highlight in transcript */
+  .transcript-box .hedge { color: var(--orange); font-weight: 500; text-decoration: underline wavy; }
+
+  /* Rapid fire progress */
+  .rf-progress {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+
+  .rf-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: 0.2s;
+  }
+
+  .rf-dot.active { background: var(--accent); transform: scale(1.3); }
+  .rf-dot.done { background: var(--green); }
+
+  /* Rapid fire results */
+  .rf-response-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .rf-response-card .rf-q-num {
+    font-size: 11px;
+    color: var(--accent2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .rf-response-card .rf-prompt {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .rf-response-card .rf-stats {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--text2);
+    margin-bottom: 8px;
+  }
+
+  .rf-response-card .rf-transcript {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.6;
+    max-height: 80px;
+    overflow-y: auto;
+  }
+
+  /* Devil's advocate phase label */
+  .devil-phase-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .devil-for { background: rgba(52,211,153,0.15); color: var(--green); }
+  .devil-against { background: rgba(248,113,113,0.15); color: var(--red); }
+
+  /* Devil's advocate side-by-side results */
+  .devil-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .devil-side {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .devil-side h4 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .devil-side .devil-transcript {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.6;
+    max-height: 150px;
+    overflow-y: auto;
+  }
+
+  /* Warmup cards */
+  .warmup-exercise {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .warmup-exercise h4 {
+    color: var(--accent2);
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .warmup-exercise .exercise-text {
+    font-size: 16px;
+    line-height: 1.8;
+    font-weight: 500;
+    padding: 12px;
+    background: var(--surface);
+    border-radius: 6px;
+    margin: 8px 0;
+  }
+
+  /* Breathing circle */
+  .breathing-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid var(--accent);
+    margin: 16px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent2);
+    transition: transform 4s ease-in-out;
+  }
+
+  .breathing-circle.inhale { transform: scale(1.4); }
+  .breathing-circle.exhale { transform: scale(0.7); }
+
+  /* nav wrap */
+  nav { display: flex; gap: 4px; flex-wrap: wrap; }
+
   @media (max-width: 640px) {
     .setup-grid { grid-template-columns: 1fr; }
     .results-grid { grid-template-columns: repeat(2, 1fr); }
     .timer-display .timer { font-size: 48px; }
     header { padding: 12px 16px; flex-direction: column; gap: 12px; }
     main { padding: 20px 16px; }
-    .mode-selector { flex-direction: column; }
+    .mode-selector { grid-template-columns: 1fr; }
+    .devil-compare { grid-template-columns: 1fr; }
+    nav { justify-content: center; }
   }
 </style>
 </head>
@@ -731,6 +899,7 @@
   <h1>Speaking<span>Coach</span></h1>
   <nav>
     <button class="active" data-tab="drill">Practice</button>
+    <button data-tab="warmup">Warm-Up</button>
     <button data-tab="frameworks">Frameworks</button>
     <button data-tab="tips">Quick Tips</button>
     <button data-tab="history">History</button>
@@ -742,6 +911,13 @@
   <section id="tab-drill">
     <!-- Setup phase -->
     <div id="drill-setup" class="card">
+      <!-- Streak display -->
+      <div class="streak-display" id="streak-display">
+        <span class="streak-fire">&#128293;</span>
+        <span class="streak-count" id="streak-count">0</span>
+        <span class="streak-label">day streak</span>
+      </div>
+
       <h2>Practice Mode</h2>
 
       <div class="mode-selector">
@@ -751,11 +927,19 @@
         </div>
         <div class="mode-btn" data-mode="recall" onclick="selectMode('recall')">
           <div class="mode-title">Fact Recall</div>
-          <div class="mode-desc">Memorize facts, weave them into your response</div>
+          <div class="mode-desc">Memorize facts, weave them in</div>
         </div>
         <div class="mode-btn" data-mode="listening" onclick="selectMode('listening')">
           <div class="mode-title">Listening</div>
-          <div class="mode-desc">Read a passage, then respond from memory</div>
+          <div class="mode-desc">Read a passage, respond from memory</div>
+        </div>
+        <div class="mode-btn" data-mode="rapidfire" onclick="selectMode('rapidfire')">
+          <div class="mode-title">Rapid Fire</div>
+          <div class="mode-desc">5 questions, 25s each, no prep</div>
+        </div>
+        <div class="mode-btn" data-mode="devil" onclick="selectMode('devil')">
+          <div class="mode-title">Devil's Advocate</div>
+          <div class="mode-desc">Argue FOR then AGAINST</div>
         </div>
       </div>
 
@@ -770,6 +954,7 @@
             <option value="abstract">Abstract & Creative</option>
             <option value="debate">Debate & Persuasion</option>
             <option value="explain">Explain Like I'm 5</option>
+            <option value="finance">Finance Simulations</option>
           </select>
         </div>
         <div class="setup-group">
@@ -822,6 +1007,10 @@
     <!-- Active drill -->
     <div id="drill-active" class="card section-hidden">
       <div class="timer-display">
+        <!-- Rapid Fire progress dots -->
+        <div id="rf-progress" class="rf-progress section-hidden"></div>
+        <!-- Devil's Advocate phase badge -->
+        <div id="devil-badge" class="section-hidden"></div>
         <div class="phase-label" id="phase-label">PREPARE</div>
         <div class="timer" id="timer">0:30</div>
         <div class="prompt-text" id="prompt-text"></div>
@@ -876,7 +1065,7 @@
         <div id="memory-reference-content"></div>
       </div>
 
-      <div class="results-grid results-grid-6" id="results-grid">
+      <div class="results-grid" id="results-grid">
         <div class="stat-card">
           <div class="stat-value" id="res-wpm">--</div>
           <div class="stat-label">Words/Min</div>
@@ -898,9 +1087,29 @@
           <div class="stat-label">Long Sentences</div>
         </div>
         <div class="stat-card">
+          <div class="stat-value" id="res-confidence">--</div>
+          <div class="stat-label">Confidence</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="res-vocab">--</div>
+          <div class="stat-label">Vocab Diversity</div>
+        </div>
+        <div class="stat-card">
           <div class="stat-value" id="res-score">--</div>
           <div class="stat-label">Overall Score</div>
         </div>
+      </div>
+
+      <!-- Rapid fire individual results -->
+      <div id="rf-results-section" class="section-hidden" style="margin-top:16px;">
+        <h3 style="font-size:15px; color:var(--accent2); margin-bottom:12px;">Individual Responses</h3>
+        <div id="rf-results-list"></div>
+      </div>
+
+      <!-- Devil's Advocate comparison -->
+      <div id="devil-results-section" class="section-hidden" style="margin-top:16px;">
+        <h3 style="font-size:15px; color:var(--accent2); margin-bottom:12px;">Side-by-Side Comparison</h3>
+        <div id="devil-results-content"></div>
       </div>
 
       <!-- Audio playback -->
@@ -1068,6 +1277,80 @@
       <div class="strength-bars" id="strength-bars"></div>
     </div>
   </section>
+
+  <!-- ===== WARM-UP TAB ===== -->
+  <section id="tab-warmup" class="section-hidden">
+    <div class="card">
+      <h2>Pre-Practice Warm-Up</h2>
+      <p style="color:var(--text2); font-size:14px; margin-bottom:20px;">
+        Spend 2-3 minutes warming up before your first drill. Professional speakers never go cold.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:12px;">Breathing Reset</h3>
+      <p style="color:var(--text2); font-size:14px; margin-bottom:16px;">
+        Box breathing calms nerves and centers your voice. Follow the circle for 4 cycles.
+      </p>
+      <div class="breathing-circle" id="breathing-circle">Ready</div>
+      <div style="text-align:center; margin-top:12px;">
+        <button class="btn btn-sm" onclick="startBreathing()">Start Breathing Exercise</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:12px;">Tongue Twisters</h3>
+      <p style="color:var(--text2); font-size:14px; margin-bottom:12px;">
+        Say each one 3x fast. This loosens your articulators — lips, tongue, jaw — so you speak more clearly under pressure.
+      </p>
+      <div class="warmup-exercise">
+        <div class="exercise-text" id="twister-text">Click "Next Twister" to begin</div>
+        <div style="text-align:center; margin-top:12px;">
+          <button class="btn btn-sm btn-outline" onclick="nextTwister()">Next Twister</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:12px;">Mental Priming</h3>
+      <p style="color:var(--text2); font-size:14px; margin-bottom:12px;">
+        Read this visualization slowly. It activates the same neural pathways as actually speaking well.
+      </p>
+      <div class="warmup-exercise">
+        <div class="exercise-text" id="priming-text" style="font-size:14px; line-height:1.8;">
+          Picture yourself walking to the front of a room. You feel calm. You make eye contact with someone in the audience and smile.
+          The question comes. You pause — just a beat. You hear yourself start with a clear, confident opening. Your voice is steady,
+          your pace is measured. You use a specific example that makes the room nod. You land your closing line and stop cleanly.
+          The room is impressed — not because you were perfect, but because you were clear, structured, and present.
+        </div>
+      </div>
+      <div class="warmup-exercise">
+        <h4>Power Poses (30 seconds)</h4>
+        <p style="font-size:14px; color:var(--text2); line-height:1.7;">
+          Stand up. Feet shoulder-width apart. Hands on hips or arms wide. Hold for 30 seconds.
+          Research by Carney & Cuddy shows this reduces cortisol and increases testosterone — even if you don't believe it works.
+          At minimum, it forces you out of a hunched, phone-scrolling posture before you speak.
+        </p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:12px;">Vocal Range Exercise</h3>
+      <p style="color:var(--text2); font-size:14px; margin-bottom:12px;">
+        Read this sentence aloud 3 times, each time with a different emphasis. This trains vocal variety so you don't sound monotone.
+      </p>
+      <div class="warmup-exercise">
+        <div class="exercise-text" id="vocal-text" style="font-size:15px;">
+          "I didn't say we should drop the deal."
+        </div>
+        <p style="font-size:13px; color:var(--text2); margin-top:8px;">
+          1st time: emphasize <strong style="color:var(--accent2);">"I"</strong> (someone else said it)<br>
+          2nd time: emphasize <strong style="color:var(--accent2);">"say"</strong> (I implied it)<br>
+          3rd time: emphasize <strong style="color:var(--accent2);">"drop"</strong> (I said we should restructure it)
+        </p>
+      </div>
+    </div>
+  </section>
 </main>
 
 <script>
@@ -1190,6 +1473,26 @@ const PROMPTS = {
     "Explain what an API is to a non-technical person.",
     "Explain why diversification matters in investing.",
   ],
+  finance: [
+    "Your portfolio company just missed revenue estimates by 8%. Walk the board through how you'd frame the miss and the go-forward plan.",
+    "You have 2 minutes to pitch a mid-market vertical SaaS company to your investment committee. The company has 120% NRR but is burning $3M/quarter. Make the case.",
+    "An LP asks why your fund underperformed the benchmark by 200bps this quarter. How do you respond?",
+    "You're presenting to the board of a portfolio company. Enrollment is down 12% YoY. What's your message?",
+    "A CEO you're backing asks whether to pursue an acquisition at 8x revenue. Walk through your framework for evaluating the deal.",
+    "Walk your investment committee through the bear case on a high-growth EdTech company trading at 15x forward revenue.",
+    "An LP asks you to explain your fund's exposure to AI risk. How do you frame it?",
+    "You're at a conference and someone asks what makes your fund's approach different. Give your 60-second differentiator.",
+    "A portfolio company's CFO just resigned unexpectedly. The CEO calls you. What do you say in the first two minutes?",
+    "Present the investment thesis for a GRC software company to someone who doesn't know the space.",
+    "A board member challenges your recommendation to increase R&D spend by 30%. Defend your position.",
+    "Walk through how you'd diligence a K-12 software company's customer retention during a downturn.",
+    "Your portfolio company is considering a pivot from on-prem to cloud. Present the tradeoffs to the board.",
+    "An LP dinner conversation turns to AI replacing software analysts. Give your view on how the role evolves.",
+    "A management team presents a plan that requires 18 months of cash burn before breakeven. Walk through the questions you'd ask.",
+    "Explain to a non-finance colleague why net revenue retention is the most important SaaS metric.",
+    "You're asked at a panel: 'What's the biggest mistake you've made as an investor?' Give a thoughtful, honest answer.",
+    "A portfolio company wants to raise prices 20% across the board. Walk through how you'd evaluate that decision.",
+  ],
 };
 
 // ===== KEY POINTS per prompt =====
@@ -1254,7 +1557,50 @@ const KEY_POINTS = {
     "T-shaped skills as a hybrid approach",
     "Market demand and scarcity considerations",
   ],
+  "Your portfolio company just missed revenue estimates by 8%. Walk the board through how you'd frame the miss and the go-forward plan.": [
+    "Acknowledge the miss directly — don't bury it",
+    "Explain root cause with specificity",
+    "Present corrective actions already underway",
+    "Reaffirm long-term thesis and next milestones",
+  ],
+  "You have 2 minutes to pitch a mid-market vertical SaaS company to your investment committee. The company has 120% NRR but is burning $3M/quarter. Make the case.": [
+    "Lead with why this market is attractive",
+    "Highlight NRR as proof of product-market fit",
+    "Address the burn rate with a path to efficiency",
+    "Explain why now is the right entry point",
+  ],
+  "An LP asks why your fund underperformed the benchmark by 200bps this quarter. How do you respond?": [
+    "Don't be defensive — own the number",
+    "Explain the composition of underperformance",
+    "Distinguish between timing and thesis issues",
+    "Reaffirm conviction in the portfolio",
+  ],
+  "Present the investment thesis for a GRC software company to someone who doesn't know the space.": [
+    "Define GRC simply — governance, risk, compliance",
+    "Explain why regulatory tailwinds drive demand",
+    "Highlight switching costs and retention dynamics",
+    "Size the market opportunity",
+  ],
 };
+
+// ===== DEVIL'S ADVOCATE POSITIONS =====
+const DEVIL_POSITIONS = [
+  "AI will replace most knowledge workers within 10 years",
+  "Remote work is strictly better than in-office work",
+  "Private equity creates more value than it destroys",
+  "College degrees will be irrelevant within 20 years",
+  "Vertical SaaS will outperform horizontal SaaS long-term",
+  "ESG investing is just marketing with no real impact",
+  "The best investment strategy is to never sell",
+  "Startups should always prioritize growth over profitability",
+  "Regulation is the biggest threat to tech innovation",
+  "Most M&A destroys shareholder value",
+  "The 60/40 portfolio is dead",
+  "Company culture matters more than strategy",
+  "First-mover advantage is overrated",
+  "Subscription pricing is always better than one-time pricing",
+  "Board seats are more valuable than ownership percentage",
+];
 
 // Default key points generator for prompts not in the map
 function generateKeyPoints(prompt) {
@@ -1427,6 +1773,35 @@ const FILLER_WORDS = [
   'you see', 'i guess'
 ];
 
+const HEDGE_WORDS = [
+  'maybe', 'probably', 'not sure', 'perhaps', 'might', 'could be',
+  'i suppose', 'arguably', 'it seems like', 'i would say', 'potentially',
+  'in a way', 'to some extent', 'i feel like', 'it depends',
+];
+
+const POWER_WORDS = [
+  "i'm confident", 'the data shows', 'clearly', 'without question',
+  'definitively', 'the evidence shows', 'i believe', 'undoubtedly',
+  'the fact is', 'it is clear', 'there is no doubt', 'i am certain',
+  'specifically', 'precisely', 'the key insight is', 'what matters most',
+  'the bottom line is', 'make no mistake',
+];
+
+const TONGUE_TWISTERS = [
+  "Red lorry, yellow lorry, red lorry, yellow lorry.",
+  "She sells seashells by the seashore.",
+  "Unique New York, you know you need unique New York.",
+  "The sixth sick sheikh's sixth sheep's sick.",
+  "Peter Piper picked a peck of pickled peppers.",
+  "How much wood would a woodchuck chuck if a woodchuck could chuck wood?",
+  "Toy boat, toy boat, toy boat.",
+  "Irish wristwatch, Swiss wristwatch.",
+  "A proper copper coffee pot.",
+  "Whether the weather is cold, whether the weather is hot, we'll weather the weather whatever the weather, whether we like it or not.",
+  "Eleven benevolent elephants.",
+  "Six sleek swans swam swiftly southwards.",
+];
+
 const FRAMEWORK_GUIDES = {
   prep: {
     name: 'PREP',
@@ -1480,6 +1855,7 @@ const CATEGORY_NAMES = {
   abstract: 'Abstract',
   debate: 'Debate',
   explain: 'Explain',
+  finance: 'Finance',
 };
 
 // ===== STATE =====
@@ -1503,6 +1879,109 @@ let interruptionCount = 0;
 let pauseTimestamps = [];
 let lastSpeechTime = null;
 let longPauses = 0;
+// Rapid fire state
+let rfResponses = [];
+let rfSplitPoint = 0;
+// Devil's advocate state
+let devilForTranscript = '';
+let devilAgainstTranscript = '';
+// Warm-up state
+let twisterIndex = -1;
+let breathingInterval = null;
+
+// ===== STREAK TRACKER =====
+function getStreak() {
+  try {
+    return JSON.parse(localStorage.getItem('speaking-coach-streak') || '{"lastDate":"","count":0}');
+  } catch { return { lastDate: '', count: 0 }; }
+}
+
+function updateStreak() {
+  const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+  const streak = getStreak();
+  if (streak.lastDate === today) return; // Already counted today
+  const yesterday = new Date(Date.now() - 86400000).toLocaleDateString('en-CA');
+  if (streak.lastDate === yesterday) {
+    streak.count += 1;
+  } else {
+    streak.count = 1;
+  }
+  streak.lastDate = today;
+  localStorage.setItem('speaking-coach-streak', JSON.stringify(streak));
+  renderStreak();
+}
+
+function renderStreak() {
+  const streak = getStreak();
+  const el = document.getElementById('streak-count');
+  if (el) el.textContent = streak.count;
+}
+
+// Init streak display
+renderStreak();
+
+// ===== WARM-UP FUNCTIONS =====
+function nextTwister() {
+  twisterIndex = (twisterIndex + 1) % TONGUE_TWISTERS.length;
+  document.getElementById('twister-text').textContent = TONGUE_TWISTERS[twisterIndex];
+}
+
+function startBreathing() {
+  const circle = document.getElementById('breathing-circle');
+  let phase = 0; // 0=inhale, 1=hold, 2=exhale, 3=hold
+  let cycles = 0;
+  const phases = ['Breathe In...', 'Hold...', 'Breathe Out...', 'Hold...'];
+
+  if (breathingInterval) { clearInterval(breathingInterval); breathingInterval = null; }
+
+  circle.textContent = phases[0];
+  circle.className = 'breathing-circle inhale';
+
+  breathingInterval = setInterval(() => {
+    phase++;
+    if (phase > 3) { phase = 0; cycles++; }
+    if (cycles >= 4) {
+      clearInterval(breathingInterval);
+      breathingInterval = null;
+      circle.textContent = 'Done!';
+      circle.className = 'breathing-circle';
+      return;
+    }
+    circle.textContent = phases[phase];
+    if (phase === 0) circle.className = 'breathing-circle inhale';
+    else if (phase === 2) circle.className = 'breathing-circle exhale';
+    else circle.className = 'breathing-circle';
+  }, 4000);
+}
+
+// ===== CONFIDENCE SCORING =====
+function scoreConfidence(text) {
+  if (!text) return { hedgeCount: 0, powerCount: 0, score: 0 };
+  const lower = ' ' + text.toLowerCase() + ' ';
+  let hedgeCount = 0;
+  let powerCount = 0;
+  HEDGE_WORDS.forEach(h => {
+    const regex = new RegExp('\\b' + h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi');
+    const m = lower.match(regex);
+    if (m) hedgeCount += m.length;
+  });
+  POWER_WORDS.forEach(p => {
+    const regex = new RegExp('\\b' + p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi');
+    const m = lower.match(regex);
+    if (m) powerCount += m.length;
+  });
+  const total = hedgeCount + powerCount;
+  const score = total > 0 ? Math.round((powerCount / total) * 100) : 50;
+  return { hedgeCount, powerCount, score };
+}
+
+// ===== VOCABULARY DIVERSITY =====
+function calcVocabDiversity(text) {
+  if (!text) return 0;
+  const words = text.toLowerCase().split(/\s+/).filter(w => w.length > 0);
+  if (words.length === 0) return 0;
+  return Math.round((new Set(words).size / words.length) * 100);
+}
 
 // ===== TAB NAVIGATION =====
 document.querySelectorAll('nav button').forEach(btn => {
@@ -1591,32 +2070,78 @@ function startDrill() {
 
   let prompt, actualCategory, facts = null, passage = null, passageQuestion = null;
 
-  if (currentMode === 'recall') {
+  if (currentMode === 'rapidfire') {
+    // Rapid Fire: 5 questions, no prep, 25s each
+    const rfQuestions = [];
+    for (let i = 0; i < 5; i++) {
+      const r = getRandomPrompt(category);
+      rfQuestions.push({ prompt: r.prompt, category: r.actualCategory });
+    }
+    prompt = rfQuestions[0].prompt;
+    actualCategory = rfQuestions[0].category;
+    rfResponses = [];
+    rfSplitPoint = 0;
+
+    drillState = {
+      category, actualCategory, framework: 'none', prepTime: 0, speakTime: 25, prompt,
+      keyPoints: [], phase: 'prep', remaining: 0, audienceOn, interruptOn: false,
+      mode: 'rapidfire', facts: null, passage: null, passageQuestion: null,
+      factsVisible: false, passageVisible: false,
+      rfQuestions, rfIndex: 0,
+    };
+  } else if (currentMode === 'devil') {
+    // Devil's Advocate: argue FOR then AGAINST
+    const position = DEVIL_POSITIONS[Math.floor(Math.random() * DEVIL_POSITIONS.length)];
+    prompt = 'Argue FOR: "' + position + '"';
+    actualCategory = category === 'all' ? 'debate' : category;
+    devilForTranscript = '';
+    devilAgainstTranscript = '';
+    const devilTime = Math.max(Math.floor(speakTime / 2), 30);
+
+    drillState = {
+      category, actualCategory, framework: 'none', prepTime, speakTime: devilTime, prompt,
+      keyPoints: [], phase: 'prep', remaining: prepTime, audienceOn, interruptOn: false,
+      mode: 'devil', facts: null, passage: null, passageQuestion: null,
+      factsVisible: false, passageVisible: false,
+      devilPosition: position, devilPhase: 'for', devilTime,
+    };
+  } else if (currentMode === 'recall') {
     const set = FACT_RECALL_SETS[Math.floor(Math.random() * FACT_RECALL_SETS.length)];
     prompt = set.prompt;
     facts = set.facts;
     actualCategory = category === 'all' ? 'business' : category;
+    drillState = {
+      category, actualCategory, framework, prepTime, speakTime, prompt,
+      keyPoints: generateKeyPoints(prompt),
+      phase: 'prep', remaining: prepTime, audienceOn, interruptOn,
+      mode: currentMode, facts, passage, passageQuestion,
+      factsVisible: true, passageVisible: false,
+    };
   } else if (currentMode === 'listening') {
     const p = LISTENING_PASSAGES[Math.floor(Math.random() * LISTENING_PASSAGES.length)];
     passage = p.passage;
     passageQuestion = p.question;
     prompt = p.question;
     actualCategory = category === 'all' ? 'business' : category;
+    drillState = {
+      category, actualCategory, framework, prepTime, speakTime, prompt,
+      keyPoints: generateKeyPoints(prompt),
+      phase: 'prep', remaining: prepTime, audienceOn, interruptOn,
+      mode: currentMode, facts, passage, passageQuestion,
+      factsVisible: false, passageVisible: true,
+    };
   } else {
     const result = getRandomPrompt(category);
     prompt = result.prompt;
     actualCategory = result.actualCategory;
+    drillState = {
+      category, actualCategory, framework, prepTime, speakTime, prompt,
+      keyPoints: generateKeyPoints(prompt),
+      phase: 'prep', remaining: prepTime, audienceOn, interruptOn,
+      mode: currentMode, facts, passage, passageQuestion,
+      factsVisible: false, passageVisible: false,
+    };
   }
-
-  const keyPoints = generateKeyPoints(prompt);
-
-  drillState = {
-    category, actualCategory, framework, prepTime, speakTime, prompt, keyPoints,
-    phase: 'prep', remaining: prepTime, audienceOn, interruptOn,
-    mode: currentMode, facts, passage, passageQuestion,
-    factsVisible: currentMode === 'recall',
-    passageVisible: currentMode === 'listening',
-  };
 
   fullTranscript = '';
   interimText = '';
@@ -1640,6 +2165,26 @@ function startDrill() {
   document.getElementById('transcript').innerHTML = '<span style="color:var(--text2);">Transcript will appear here when speaking begins...</span>';
   document.getElementById('transcript-area').classList.add('section-hidden');
 
+  // Rapid Fire progress dots
+  const rfProgress = document.getElementById('rf-progress');
+  if (currentMode === 'rapidfire') {
+    rfProgress.innerHTML = Array.from({length: 5}, (_, i) =>
+      '<div class="rf-dot' + (i === 0 ? ' active' : '') + '"></div>'
+    ).join('');
+    rfProgress.classList.remove('section-hidden');
+  } else {
+    rfProgress.classList.add('section-hidden');
+  }
+
+  // Devil's Advocate badge
+  const devilBadge = document.getElementById('devil-badge');
+  if (currentMode === 'devil') {
+    devilBadge.innerHTML = '<span class="devil-phase-badge devil-for">ARGUE FOR</span>';
+    devilBadge.classList.remove('section-hidden');
+  } else {
+    devilBadge.classList.add('section-hidden');
+  }
+
   // Facts area
   const factsArea = document.getElementById('facts-area');
   if (currentMode === 'recall' && facts) {
@@ -1662,9 +2207,14 @@ function startDrill() {
   // Key points (show during prep)
   const kpDisplay = document.getElementById('key-points-display');
   const kpList = document.getElementById('key-points-list');
-  if (currentMode === 'standard') {
-    kpList.innerHTML = keyPoints.map(p => '<div style="font-size:14px; padding:4px 0; color:var(--text2);">• ' + p + '</div>').join('');
-    kpDisplay.classList.remove('section-hidden');
+  if (currentMode === 'standard' || currentMode === 'devil') {
+    const kp = drillState.keyPoints || generateKeyPoints(prompt);
+    kpList.innerHTML = kp.map(p => '<div style="font-size:14px; padding:4px 0; color:var(--text2);">• ' + p + '</div>').join('');
+    if (kp.length > 0 && kp[0] !== "State a clear position or thesis") {
+      kpDisplay.classList.remove('section-hidden');
+    } else {
+      kpDisplay.classList.add('section-hidden');
+    }
   } else {
     kpDisplay.classList.add('section-hidden');
   }
@@ -1687,14 +2237,15 @@ function startDrill() {
     document.getElementById('audience-bar').classList.add('section-hidden');
   }
 
-  if (prepTime === 0) {
+  if (currentMode === 'rapidfire' || prepTime === 0) {
     startSpeakingPhase();
   } else {
     drillState.phase = 'prep';
     drillState.remaining = prepTime;
     document.getElementById('phase-label').textContent =
       currentMode === 'recall' ? 'MEMORIZE' :
-      currentMode === 'listening' ? 'READ & ABSORB' : 'PREPARE';
+      currentMode === 'listening' ? 'READ & ABSORB' :
+      currentMode === 'devil' ? 'PREPARE YOUR ARGUMENT' : 'PREPARE';
     document.getElementById('phase-label').className = 'phase-label prep-color';
     document.getElementById('skip-btn').textContent = 'Skip to Speaking';
     document.getElementById('skip-btn').classList.remove('section-hidden');
@@ -1709,9 +2260,15 @@ function startSpeakingPhase() {
   speakingStartTime = Date.now();
   lastSpeechTime = Date.now();
 
-  document.getElementById('phase-label').textContent = 'SPEAK NOW';
+  if (drillState.mode === 'rapidfire') {
+    document.getElementById('phase-label').textContent = 'QUESTION ' + (drillState.rfIndex + 1) + ' OF 5';
+  } else if (drillState.mode === 'devil') {
+    document.getElementById('phase-label').textContent = drillState.devilPhase === 'for' ? 'ARGUE FOR' : 'ARGUE AGAINST';
+  } else {
+    document.getElementById('phase-label').textContent = 'SPEAK NOW';
+  }
   document.getElementById('phase-label').className = 'phase-label speaking-color';
-  document.getElementById('skip-btn').textContent = 'Finish Early';
+  document.getElementById('skip-btn').textContent = drillState.mode === 'rapidfire' ? 'Next Question' : 'Finish Early';
   document.getElementById('transcript-area').classList.remove('section-hidden');
 
   // Hide facts in recall mode
@@ -1769,10 +2326,73 @@ function tick() {
   if (drillState.remaining <= 0) {
     if (drillState.phase === 'prep') {
       startSpeakingPhase();
+    } else if (drillState.mode === 'rapidfire') {
+      advanceRapidFire();
+    } else if (drillState.mode === 'devil' && drillState.devilPhase === 'for') {
+      advanceDevil();
     } else {
       finishDrill();
     }
   }
+}
+
+function advanceRapidFire() {
+  // Save current response
+  const currentTranscript = fullTranscript.substring(rfSplitPoint).trim();
+  const currentWords = currentTranscript ? currentTranscript.split(/\s+/).filter(w => w.length > 0) : [];
+  rfResponses.push({
+    prompt: drillState.rfQuestions[drillState.rfIndex].prompt,
+    transcript: currentTranscript,
+    wordCount: currentWords.length,
+  });
+
+  drillState.rfIndex++;
+
+  if (drillState.rfIndex >= 5) {
+    finishDrill();
+    return;
+  }
+
+  // Update to next question
+  rfSplitPoint = fullTranscript.length;
+  drillState.prompt = drillState.rfQuestions[drillState.rfIndex].prompt;
+  drillState.remaining = drillState.speakTime;
+  document.getElementById('prompt-text').textContent = drillState.prompt;
+  document.getElementById('phase-label').textContent = 'QUESTION ' + (drillState.rfIndex + 1) + ' OF 5';
+
+  // Update progress dots
+  const dots = document.querySelectorAll('.rf-dot');
+  dots.forEach((d, i) => {
+    d.classList.remove('active', 'done');
+    if (i < drillState.rfIndex) d.classList.add('done');
+    else if (i === drillState.rfIndex) d.classList.add('active');
+  });
+
+  updateTimerDisplay();
+}
+
+function advanceDevil() {
+  // Save the FOR transcript
+  devilForTranscript = fullTranscript.trim();
+
+  // Switch to AGAINST
+  drillState.devilPhase = 'against';
+  drillState.prompt = 'Now argue AGAINST: "' + drillState.devilPosition + '"';
+  drillState.remaining = drillState.devilTime;
+  fullTranscript = '';
+  interimText = '';
+
+  document.getElementById('prompt-text').textContent = drillState.prompt;
+  document.getElementById('phase-label').textContent = 'ARGUE AGAINST';
+  document.getElementById('phase-label').className = 'phase-label';
+  document.getElementById('phase-label').style.color = 'var(--red)';
+
+  const devilBadge = document.getElementById('devil-badge');
+  devilBadge.innerHTML = '<span class="devil-phase-badge devil-against">ARGUE AGAINST</span>';
+
+  document.getElementById('transcript').innerHTML = '<span style="color:var(--text2);">Now argue the opposite...</span>';
+
+  updateTimerDisplay();
 }
 
 function updateTimerDisplay() {
@@ -1792,6 +2412,10 @@ function updateTimerDisplay() {
 function skipPhase() {
   if (drillState.phase === 'prep') {
     startSpeakingPhase();
+  } else if (drillState.mode === 'rapidfire') {
+    advanceRapidFire();
+  } else if (drillState.mode === 'devil' && drillState.devilPhase === 'for') {
+    advanceDevil();
   } else {
     finishDrill();
   }
@@ -1819,6 +2443,22 @@ function finishDrill() {
 
   if (speakingStartTime) {
     speakingElapsed = (Date.now() - speakingStartTime) / 1000;
+  }
+
+  // Save last rapid fire response if needed
+  if (drillState && drillState.mode === 'rapidfire' && drillState.rfIndex < 5) {
+    const currentTranscript = fullTranscript.substring(rfSplitPoint).trim();
+    const currentWords = currentTranscript ? currentTranscript.split(/\s+/).filter(w => w.length > 0) : [];
+    rfResponses.push({
+      prompt: drillState.rfQuestions[drillState.rfIndex].prompt,
+      transcript: currentTranscript,
+      wordCount: currentWords.length,
+    });
+  }
+
+  // Save devil against transcript
+  if (drillState && drillState.mode === 'devil' && drillState.devilPhase === 'against') {
+    devilAgainstTranscript = fullTranscript.trim();
   }
 
   stopRecognition();
@@ -2237,7 +2877,11 @@ function showResults() {
   document.getElementById('drill-active').classList.add('section-hidden');
   document.getElementById('drill-results').classList.remove('section-hidden');
 
-  const text = fullTranscript.trim();
+  // For devil mode, combine both transcripts for aggregate analysis
+  let text = fullTranscript.trim();
+  if (drillState && drillState.mode === 'devil') {
+    text = (devilForTranscript + ' ' + devilAgainstTranscript).trim();
+  }
   const words = text ? text.split(/\s+/).filter(w => w.length > 0) : [];
   wordCount = words.length;
 
@@ -2299,6 +2943,21 @@ function showResults() {
   const longSentEl = document.getElementById('res-long-sent');
   longSentEl.textContent = sentenceAnalysis.longCount;
   longSentEl.className = 'stat-value ' + (sentenceAnalysis.longCount === 0 ? 'score-excellent' : sentenceAnalysis.longCount <= 2 ? 'score-good' : 'score-needs-work');
+
+  // Confidence scoring
+  const confidence = scoreConfidence(text);
+  const confEl = document.getElementById('res-confidence');
+  confEl.textContent = wordCount > 0 ? confidence.score + '%' : '--';
+  confEl.className = 'stat-value ' + (confidence.score >= 60 ? 'score-excellent' : confidence.score >= 40 ? 'score-good' : confidence.score >= 20 ? 'score-needs-work' : 'score-poor');
+
+  // Vocab diversity
+  const vocabDiv = calcVocabDiversity(text);
+  const vocabEl = document.getElementById('res-vocab');
+  vocabEl.textContent = wordCount > 0 ? vocabDiv + '%' : '--';
+  vocabEl.className = 'stat-value ' + (vocabDiv >= 55 ? 'score-excellent' : vocabDiv >= 40 ? 'score-good' : 'score-needs-work');
+
+  // Factor confidence into score
+  if (confidence.hedgeCount > 3) score -= 5;
 
   const scoreEl = document.getElementById('res-score');
   scoreEl.textContent = score;
@@ -2422,9 +3081,63 @@ function showResults() {
     if (drillState && drillState.interruptOn && interruptionCount > 0) {
       feedbackHTML += '<div class="feedback-item"><div class="label">Interruptions</div>You handled ' + interruptionCount + ' interruption(s). The key is to briefly address the follow-up, then smoothly transition back: "Coming back to my main point..."</div>';
     }
+
+    // Confidence language feedback
+    if (confidence.hedgeCount > 0 || confidence.powerCount > 0) {
+      let confFB = '<div class="feedback-item"><div class="label">Confidence Language</div>';
+      if (confidence.hedgeCount > confidence.powerCount) {
+        confFB += 'You used ' + confidence.hedgeCount + ' hedge phrase(s) vs ' + confidence.powerCount + ' power phrase(s). Replace hedges like "maybe" and "I guess" with assertive language: "I\'m confident that..." or "The data shows..."';
+      } else if (confidence.powerCount > 0) {
+        confFB += 'Strong authority language: ' + confidence.powerCount + ' power phrase(s) vs ' + confidence.hedgeCount + ' hedge(s). You sound decisive.';
+      }
+      confFB += '</div>';
+      feedbackHTML += confFB;
+    }
+
+    // Vocab diversity feedback
+    if (vocabDiv > 0) {
+      if (vocabDiv < 35) {
+        feedbackHTML += '<div class="feedback-item"><div class="label">Vocabulary</div>Vocab diversity: ' + vocabDiv + '%. You\'re repeating words frequently. Try varying your word choice — use synonyms and rephrase repeated concepts.</div>';
+      } else if (vocabDiv >= 55) {
+        feedbackHTML += '<div class="feedback-item"><div class="label">Vocabulary</div>Vocab diversity: ' + vocabDiv + '%. Excellent range — you\'re using varied language which keeps the audience engaged.</div>';
+      }
+    }
   }
 
   feedbackEl.innerHTML = feedbackHTML;
+
+  // Rapid fire individual results
+  const rfSection = document.getElementById('rf-results-section');
+  if (drillState && drillState.mode === 'rapidfire' && rfResponses.length > 0) {
+    const rfList = document.getElementById('rf-results-list');
+    rfList.innerHTML = rfResponses.map((r, i) => {
+      const rWords = r.transcript ? r.transcript.split(/\s+/).filter(w => w.length > 0).length : 0;
+      return '<div class="rf-response-card">' +
+        '<div class="rf-q-num">Question ' + (i + 1) + '</div>' +
+        '<div class="rf-prompt">' + escapeHtml(r.prompt) + '</div>' +
+        '<div class="rf-stats"><span>' + rWords + ' words</span></div>' +
+        '<div class="rf-transcript">' + (highlightFillers(r.transcript) || '<em>No response</em>') + '</div>' +
+        '</div>';
+    }).join('');
+    rfSection.classList.remove('section-hidden');
+  } else {
+    rfSection.classList.add('section-hidden');
+  }
+
+  // Devil's Advocate comparison
+  const devilSection = document.getElementById('devil-results-section');
+  if (drillState && drillState.mode === 'devil') {
+    const devilContent = document.getElementById('devil-results-content');
+    devilContent.innerHTML = '<div class="devil-compare">' +
+      '<div class="devil-side"><h4 style="color:var(--green);">FOR</h4>' +
+      '<div class="devil-transcript">' + (highlightFillers(devilForTranscript) || '<em>No response</em>') + '</div></div>' +
+      '<div class="devil-side"><h4 style="color:var(--red);">AGAINST</h4>' +
+      '<div class="devil-transcript">' + (highlightFillers(devilAgainstTranscript) || '<em>No response</em>') + '</div></div>' +
+      '</div>';
+    devilSection.classList.remove('section-hidden');
+  } else {
+    devilSection.classList.add('section-hidden');
+  }
 
   // Final transcript with long sentence highlights
   document.getElementById('final-transcript').innerHTML = highlightLongSentences(text) || '<span style="color:var(--text2);">No transcript recorded.</span>';
@@ -2463,12 +3176,17 @@ function showResults() {
     words: wordCount,
     pauses: longPauses,
     longSentences: sentenceAnalysis.longCount,
+    confidence: confidence.score,
+    vocabDiversity: vocabDiv,
     score,
     duration: Math.round(speakingElapsed),
   });
 
   // Update category score for spaced repetition
   updateCategoryScore(actualCategory, score);
+
+  // Update streak
+  updateStreak();
 }
 
 // ===== HISTORY =====
@@ -2537,7 +3255,7 @@ function renderHistory() {
     const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     const prompt = h.prompt.length > 40 ? h.prompt.substring(0, 40) + '...' : h.prompt;
     const scoreBadge = h.score >= 80 ? 'badge-green' : h.score >= 50 ? 'badge-yellow' : 'badge-red';
-    const modeLabel = h.mode === 'recall' ? 'Recall' : h.mode === 'listening' ? 'Listen' : 'Std';
+    const modeLabel = h.mode === 'recall' ? 'Recall' : h.mode === 'listening' ? 'Listen' : h.mode === 'rapidfire' ? 'RF' : h.mode === 'devil' ? 'Devil' : 'Std';
 
     html += '<tr>' +
       '<td>' + dateStr + '</td>' +
