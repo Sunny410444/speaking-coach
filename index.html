@@ -639,6 +639,82 @@
   .mode-btn .mode-title { font-weight: 600; font-size: 14px; }
   .mode-btn .mode-desc { font-size: 12px; color: var(--text2); margin-top: 4px; }
 
+  /* Memory reference in results */
+  .memory-ref-box {
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .memory-ref-box h4 {
+    font-size: 12px;
+    color: var(--accent2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+
+  .memory-ref-box .ref-item {
+    padding: 6px 0;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text2);
+  }
+
+  .memory-ref-box .ref-item:last-child { border-bottom: none; }
+
+  .memory-ref-box .ref-passage {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text2);
+  }
+
+  /* Structure tips */
+  .structure-tips {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+  }
+
+  .structure-tips h4 {
+    font-size: 13px;
+    color: var(--accent2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+
+  .structure-tip-item {
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    background: rgba(108,99,255,0.06);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .structure-tip-item:last-child { margin-bottom: 0; }
+
+  .structure-tip-item .tip-label {
+    font-weight: 600;
+    color: var(--accent2);
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  .structure-tip-item .tip-example {
+    font-style: italic;
+    color: var(--text2);
+    font-size: 13px;
+    margin-top: 6px;
+    padding-left: 12px;
+    border-left: 2px solid var(--border);
+  }
+
   @media (max-width: 640px) {
     .setup-grid { grid-template-columns: 1fr; }
     .results-grid { grid-template-columns: repeat(2, 1fr); }
@@ -795,6 +871,11 @@
       <h2>Session Results</h2>
       <div id="prompt-recall" style="color:var(--text2); font-size:14px; margin-bottom:16px;"></div>
 
+      <!-- Original memory content for cross-reference -->
+      <div id="memory-reference" class="section-hidden" style="margin-bottom:20px;">
+        <div id="memory-reference-content"></div>
+      </div>
+
       <div class="results-grid results-grid-6" id="results-grid">
         <div class="stat-card">
           <div class="stat-value" id="res-wpm">--</div>
@@ -839,6 +920,12 @@
       <div style="margin-top:16px;">
         <h3 style="font-size:15px; color:var(--accent2); margin-bottom:8px;">Your Transcript</h3>
         <div class="transcript-box" id="final-transcript" style="max-height:300px;"></div>
+      </div>
+
+      <!-- Structure & Articulation Tips -->
+      <div id="structure-tips-section" class="structure-tips section-hidden">
+        <h4>How You Could Say It Better</h4>
+        <div id="structure-tips-content"></div>
       </div>
 
       <div style="margin-top:20px; display:flex; gap:12px;">
@@ -2019,6 +2106,132 @@ function scoreFramework(text, frameworkKey) {
   return { results, inOrder, stepsHit, totalSteps, score, name: fw.name };
 }
 
+// ===== STRUCTURE TIPS GENERATOR =====
+function generateStructureTips(text, state, wpm, fillerCount, sentenceAnalysis, frameworkResult) {
+  const tips = [];
+  const lower = text.toLowerCase();
+  const sentences = text.split(/[.!?]+/).map(s => s.trim()).filter(s => s.length > 0);
+  const firstSentence = sentences[0] || '';
+  const lastSentence = sentences[sentences.length - 1] || '';
+  const prompt = state ? state.prompt : '';
+
+  // 1. Opening — did they start with a clear position or meander?
+  const strongOpeners = ['i believe', 'my view is', 'the key point is', 'the answer is', 'in my opinion', 'i think the', 'yes', 'no', 'absolutely', 'the most important'];
+  const hasStrongOpen = strongOpeners.some(o => firstSentence.toLowerCase().startsWith(o) || firstSentence.toLowerCase().includes(o));
+  const hedgeOpeners = ['so', 'well', 'um', 'uh', 'that\'s a good question', 'that\'s a great question', 'hmm', 'let me think', 'i don\'t know'];
+  const hasHedgeOpen = hedgeOpeners.some(h => firstSentence.toLowerCase().startsWith(h));
+
+  if (hasHedgeOpen) {
+    tips.push({
+      label: 'Stronger Opening',
+      tip: 'You started with a hedge or filler. Lead with your conclusion — state your position in the first sentence, then support it.',
+      example: 'Instead of "' + firstSentence.substring(0, 60) + '..." try opening with: "I believe [your main point] because [top reason]."'
+    });
+  } else if (!hasStrongOpen && sentences.length > 2) {
+    tips.push({
+      label: 'Lead With Your Thesis',
+      tip: 'Your opening didn\'t state a clear position up front. The most confident speakers give their answer first, then explain. This is the "bottom-line up front" approach.',
+      example: 'Try starting with: "The most important thing about [topic] is..." or "My position is... and here\'s why."'
+    });
+  }
+
+  // 2. Closing — did they end strong or trail off?
+  const weakClosers = ['so yeah', 'that\'s about it', 'i guess', 'i don\'t know', 'whatever', 'anyway', 'so', 'yeah', 'and stuff', 'that\'s pretty much it'];
+  const hasWeakClose = weakClosers.some(w => lastSentence.toLowerCase().endsWith(w) || lastSentence.toLowerCase() === w);
+  const strongClosers = ['that\'s why', 'and that is why', 'in conclusion', 'ultimately', 'the bottom line', 'this is why', 'for these reasons'];
+  const hasStrongClose = strongClosers.some(c => lastSentence.toLowerCase().includes(c));
+
+  if (hasWeakClose) {
+    tips.push({
+      label: 'Stronger Closing',
+      tip: 'You trailed off at the end. Plan your last sentence — it\'s what people remember most. Drop your pitch and end with conviction.',
+      example: 'Instead of trailing off, try: "And that\'s exactly why [restate your main point]." or "For these reasons, I believe [position]."'
+    });
+  } else if (!hasStrongClose && sentences.length > 3) {
+    tips.push({
+      label: 'Bookend Your Response',
+      tip: 'A strong response circles back to the opening point. Restating your thesis at the end creates a satisfying "bookend" structure that sounds polished.',
+      example: 'End with: "And that\'s why I believe..." or "Coming back to the core question — [your answer]."'
+    });
+  }
+
+  // 3. Transitions — did they use connective tissue?
+  const transitions = ['first', 'second', 'third', 'additionally', 'furthermore', 'however', 'on the other hand', 'that said', 'in contrast', 'building on that', 'to put it another way', 'another way to think about'];
+  const transitionCount = transitions.filter(t => lower.includes(t)).length;
+  if (transitionCount === 0 && sentences.length > 4) {
+    tips.push({
+      label: 'Add Transitions Between Ideas',
+      tip: 'Your response jumped between points without signposts. Transitions help the listener follow your logic and make you sound more structured.',
+      example: 'Use phrases like: "First... Second... Third..." or "Building on that..." or "However, the counterpoint is..." or "There are three things to consider here."'
+    });
+  }
+
+  // 4. Specificity — did they use concrete examples?
+  const exampleSignals = ['for example', 'for instance', 'consider', 'such as', 'take the case', 'like when', 'a good example', 'imagine', 'specifically', 'in my experience', 'i once', 'i saw', 'at my', 'one company', 'one time'];
+  const hasExample = exampleSignals.some(e => lower.includes(e));
+  if (!hasExample && sentences.length > 3) {
+    tips.push({
+      label: 'Add a Concrete Example',
+      tip: 'Your response stayed abstract. One specific example, story, or data point makes your argument 10x more memorable and persuasive.',
+      example: 'Try inserting: "For example, [company/person/situation] shows this because..." or "I saw this firsthand when..." or "The data shows that [specific number]."'
+    });
+  }
+
+  // 5. Long sentences — how to fix them
+  if (sentenceAnalysis.longCount > 0) {
+    tips.push({
+      label: 'Break Up Long Sentences',
+      tip: 'You had ' + sentenceAnalysis.longCount + ' sentence(s) over 30 words. Long sentences signal you\'re constructing your argument in real time. Short, punchy sentences sound more confident.',
+      example: 'Where you said a long clause with "and" or "but," try putting a period instead. Two short sentences always sound clearer than one long one.'
+    });
+  }
+
+  // 6. Rule of three
+  const hasThree = lower.includes('three') || lower.includes('3 ') || (lower.includes('first') && lower.includes('second'));
+  if (!hasThree && sentences.length > 5 && !frameworkResult) {
+    tips.push({
+      label: 'Use the Rule of Three',
+      tip: 'Grouping your points into three items makes any answer sound structured — even if you\'re making it up on the spot. Three feels complete without being overwhelming.',
+      example: 'Try: "There are three things I\'d highlight here. First... Second... And third..." This works for nearly any prompt.'
+    });
+  }
+
+  // 7. Reframing / bridging for tough prompts
+  const isDebateOrAbstract = state && (state.actualCategory === 'debate' || state.actualCategory === 'abstract');
+  const bridgePhrases = ['the way i think about', 'let me frame', 'the real question', 'i\'d reframe', 'the more interesting question', 'from my perspective', 'through the lens of'];
+  const hasBridge = bridgePhrases.some(b => lower.includes(b));
+  if (isDebateOrAbstract && !hasBridge) {
+    tips.push({
+      label: 'Reframe to Your Strength',
+      tip: 'For abstract or debate topics, bridge to what you know. You don\'t have to answer the question exactly as asked — reframing shows confidence.',
+      example: 'Try: "The way I think about this is through the lens of [your domain]..." or "I\'d reframe this question as..."'
+    });
+  }
+
+  // 8. Acknowledging counterarguments
+  const counterSignals = ['on the other hand', 'some might argue', 'the counterpoint', 'critics would say', 'the risk is', 'that said', 'however', 'to be fair', 'the other side'];
+  const hasCounter = counterSignals.some(c => lower.includes(c));
+  if (!hasCounter && sentences.length > 5 && state && state.actualCategory === 'debate') {
+    tips.push({
+      label: 'Acknowledge the Other Side',
+      tip: 'In debate-style prompts, briefly acknowledging the counterargument before dismissing it makes your position sound stronger, not weaker.',
+      example: 'Try: "Now, some might argue [counterpoint]. But the evidence suggests..." or "To be fair, [concession] — however, [your stronger point]."'
+    });
+  }
+
+  // 9. Pace-related articulation advice
+  if (wpm > 180) {
+    tips.push({
+      label: 'Use Strategic Pauses',
+      tip: 'At ' + wpm + ' WPM, you\'re rushing. Insert a 1-2 second pause after each major point. This gives the audience time to absorb — and gives you time to think.',
+      example: 'After stating a key point, pause. Then say "And here\'s why that matters..." The pause makes the next point land harder.'
+    });
+  }
+
+  // Limit to top 5 most relevant tips
+  return tips.slice(0, 5);
+}
+
 // ===== RESULTS =====
 function showResults() {
   document.getElementById('drill-active').classList.add('section-hidden');
@@ -2102,6 +2315,21 @@ function showResults() {
 
   // Prompt recall
   document.getElementById('prompt-recall').textContent = 'Prompt: "' + (drillState ? drillState.prompt : '') + '"';
+
+  // Memory reference — show original facts/passage for cross-referencing
+  const memRef = document.getElementById('memory-reference');
+  const memRefContent = document.getElementById('memory-reference-content');
+  if (drillState && drillState.mode === 'recall' && drillState.facts) {
+    memRefContent.innerHTML = '<div class="memory-ref-box"><h4>Original Facts to Remember</h4>' +
+      drillState.facts.map(f => '<div class="ref-item">' + escapeHtml(f) + '</div>').join('') + '</div>';
+    memRef.classList.remove('section-hidden');
+  } else if (drillState && drillState.mode === 'listening' && drillState.passage) {
+    memRefContent.innerHTML = '<div class="memory-ref-box"><h4>Original Passage</h4>' +
+      '<div class="ref-passage">' + escapeHtml(drillState.passage) + '</div></div>';
+    memRef.classList.remove('section-hidden');
+  } else {
+    memRef.classList.add('section-hidden');
+  }
 
   // Key points self-check
   const kpCheck = document.getElementById('key-points-check');
@@ -2200,6 +2428,27 @@ function showResults() {
 
   // Final transcript with long sentence highlights
   document.getElementById('final-transcript').innerHTML = highlightLongSentences(text) || '<span style="color:var(--text2);">No transcript recorded.</span>';
+
+  // Structure & Articulation Tips
+  const structureTips = document.getElementById('structure-tips-section');
+  const structureTipsContent = document.getElementById('structure-tips-content');
+  if (text && wordCount > 10) {
+    const tips = generateStructureTips(text, drillState, wpm, fillerCount, sentenceAnalysis, frameworkResult);
+    if (tips.length > 0) {
+      structureTipsContent.innerHTML = tips.map(t =>
+        '<div class="structure-tip-item">' +
+        '<div class="tip-label">' + escapeHtml(t.label) + '</div>' +
+        '<div>' + escapeHtml(t.tip) + '</div>' +
+        (t.example ? '<div class="tip-example">' + escapeHtml(t.example) + '</div>' : '') +
+        '</div>'
+      ).join('');
+      structureTips.classList.remove('section-hidden');
+    } else {
+      structureTips.classList.add('section-hidden');
+    }
+  } else {
+    structureTips.classList.add('section-hidden');
+  }
 
   // Save to history
   const actualCategory = drillState ? drillState.actualCategory : 'general';
